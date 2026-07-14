@@ -616,6 +616,32 @@ button { font-family: var(--font-body); cursor: pointer; }
 .footer-links a:hover { color: var(--accent); }
 .footer-copy { text-align: center; color: var(--text-faint); font-size: .78rem; margin: 32px 0 0; }
 
+.credits-box {
+  max-width: 480px;
+  margin: 24px auto 0;
+  padding: 18px 22px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-s);
+  background: var(--card);
+  text-align: center;
+}
+.credits-version {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+  font-weight: 500;
+}
+.credits-text {
+  font-size: .82rem;
+  color: var(--text-muted);
+  margin: 4px 0;
+  line-height: 1.5;
+}
+.credits-text strong { color: var(--text); font-weight: 600; }
+
 /* ---------------------------------------------------------------------
    RESPONSIVE
    --------------------------------------------------------------------- */

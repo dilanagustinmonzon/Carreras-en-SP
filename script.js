@@ -132,8 +132,51 @@
     return value && value.trim() !== "" ? value : `<span class="empty-field" style="color:var(--text-faint)">Información no disponible todavía.</span>`;
   }
 
+  function base64ToBlob(base64, mime) {
+    const byteChars = atob(base64);
+    const byteNumbers = new Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+    return new Blob([new Uint8Array(byteNumbers)], { type: mime });
+  }
+
+  // Descarga confiable en cualquier dispositivo (incluidos celulares): si el PDF
+  // está embebido en pdfs-data.js, se arma un blob en memoria y se dispara la
+  // descarga desde ahí, sin depender de que el navegador pueda acceder a un
+  // archivo suelto en la carpeta /pdfs/ (eso es lo que fallaba en algunos
+  // celulares al abrir el sitio directamente desde el archivo).
+  window.downloadEmbeddedPdf = function (key, filename) {
+    try {
+      const base64 = window.PDFS_BASE64 && window.PDFS_BASE64[key];
+      if (!base64) { showToast("No se pudo descargar el PDF"); return; }
+      const blob = base64ToBlob(base64, "application/pdf");
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // En algunos navegadores móviles el "download" no dispara automáticamente;
+      // como respaldo, si en 400ms no pasó nada, se abre el PDF en una pestaña
+      // nueva para que el usuario pueda guardarlo manualmente.
+      setTimeout(() => { try { window.open(url, "_blank"); } catch (e) {} }, 400);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (e) {
+      showToast("No se pudo descargar el PDF");
+    }
+  };
+
   function pdfButton(label, filename, careerId) {
     if (filename) {
+      const key = careerId + "/" + filename;
+      const isEmbedded = typeof PDFS_BASE64 !== "undefined" && PDFS_BASE64[key];
+      if (isEmbedded) {
+        return `<button type="button" class="download-btn" onclick="downloadEmbeddedPdf('${key}','${filename}')">
+          <span>${label}</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 19h14"/></svg>
+        </button>`;
+      }
+      // Respaldo por si se agrega un PDF nuevo sin re-generar pdfs-data.js
       return `<a class="download-btn" href="pdfs/${careerId}/${filename}" download="${filename}" target="_blank" rel="noopener">
         <span>${label}</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 19h14"/></svg>

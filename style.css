@@ -536,14 +536,19 @@ button { font-family: var(--font-body); cursor: pointer; }
 .downloads-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-top: 14px; }
 .download-btn {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
   background: var(--card);
   border: 1.5px solid var(--card-border);
   border-radius: var(--radius-s);
   padding: 16px 18px;
   text-decoration: none;
   color: var(--text);
+  font-family: var(--font-body);
   font-weight: 500;
   font-size: .92rem;
+  text-align: left;
+  cursor: pointer;
   transition: border-color .2s ease, transform .2s ease;
 }
 .download-btn:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-2px); }

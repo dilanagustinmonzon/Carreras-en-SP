@@ -330,6 +330,7 @@ button { font-family: var(--font-body); cursor: pointer; }
 
 .card-meta {
   display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
   font-family: var(--font-mono);
   font-size: .74rem;
   color: var(--text-faint);
@@ -613,9 +614,48 @@ button { font-family: var(--font-body); cursor: pointer; }
 /* ---------------------------------------------------------------------
    RESPONSIVE
    --------------------------------------------------------------------- */
-@media (max-width: 560px) {
-  .hero { padding: 56px 0 40px; }
-  .careers-grid { grid-template-columns: 1fr; }
-  .detail-header { flex-direction: column; }
-  .header-inner { height: 60px; }
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+
+  .header-inner { height: 58px; }
+  .brand-text { font-size: .95rem; }
+  .icon-btn { width: 36px; height: 36px; }
+
+  .hero { padding: 40px 0 32px; }
+  .hero-title { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+  .hero-sub { font-size: .96rem; }
+  #searchInput { padding: 14px 18px 14px 46px; font-size: .95rem; }
+
+  .careers-section { padding: 8px 0 48px; }
+  .careers-grid { grid-template-columns: 1fr; gap: 14px; }
+  .career-card { padding: 20px; }
+
+  .university-section { padding: 40px 0; }
+  .instituciones-grid { grid-template-columns: 1fr; }
+
+  .faq-section { padding: 40px 0 56px; }
+
+  /* Panel de detalle: más cómodo para pulgares y lectura en pantalla chica */
+  .detail-panel-inner { padding: 18px 16px 90px; }
+  .detail-header { flex-direction: column; gap: 10px; }
+  .detail-icon { width: 52px; height: 52px; font-size: 2rem; }
+  .detail-title { font-size: 1.5rem; }
+  .detail-stats { grid-template-columns: 1fr 1fr; }
+  .detail-close { width: 100%; text-align: center; }
+
+  /* Sueldos y descargas: una columna, botones grandes y fáciles de tocar */
+  .salary-grid { grid-template-columns: 1fr; }
+  .downloads-grid { grid-template-columns: 1fr; }
+  .download-btn { padding: 16px; min-height: 52px; }
+  .download-btn small { font-size: .78rem; }
+
+  .back-to-top { right: 14px; bottom: 14px; width: 44px; height: 44px; }
+  .footer-inner { flex-direction: column; gap: 20px; }
 }
+
+@media (max-width: 380px) {
+  .hero-title { font-size: 1.45rem; }
+  .card-meta { flex-wrap: wrap; }
+  .detail-stats { grid-template-columns: 1fr; }
+}
+

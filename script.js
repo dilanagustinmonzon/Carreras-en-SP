@@ -134,7 +134,7 @@
 
   function pdfButton(label, filename, careerId) {
     if (filename) {
-      return `<a class="download-btn" href="pdfs/${careerId}/${filename}" download>
+      return `<a class="download-btn" href="pdfs/${careerId}/${filename}" download="${filename}" target="_blank" rel="noopener">
         <span>${label}</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 19h14"/></svg>
       </a>`;

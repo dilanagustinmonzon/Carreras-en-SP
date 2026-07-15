@@ -247,6 +247,60 @@ button { font-family: var(--font-body); cursor: pointer; }
 .chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
 
 /* ---------------------------------------------------------------------
+   PANEL DE FILTROS AVANZADOS (tipo de título, modalidad, institución)
+   --------------------------------------------------------------------- */
+.filters-panel {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--card-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 28px;
+  align-items: flex-start;
+  animation: fadeUp .7s ease .26s both;
+}
+.filter-group { display: flex; flex-direction: column; gap: 8px; }
+.filter-label {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-faint);
+}
+.institution-select {
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: .84rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 220px;
+}
+.institution-select:focus { outline: none; border-color: var(--accent); }
+.clear-filters-btn {
+  align-self: flex-end;
+  border: 1.5px dashed var(--card-border);
+  background: transparent;
+  color: var(--text-faint);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.clear-filters-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+@media (max-width: 640px) {
+  .filters-panel { gap: 16px 20px; }
+  .institution-select { min-width: 0; width: 100%; }
+  .clear-filters-btn { align-self: flex-start; }
+}
+
+/* ---------------------------------------------------------------------
    SECCIONES GENERALES
    --------------------------------------------------------------------- */
 .section-eyebrow {

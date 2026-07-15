@@ -8,14 +8,42 @@
   const grid = document.getElementById("careersGrid");
   const searchInput = document.getElementById("searchInput");
   const chipsWrap = document.getElementById("categoryChips");
+  const titleChipsWrap = document.getElementById("titleChips");
+  const modalityChipsWrap = document.getElementById("modalityChips");
+  const institutionSelect = document.getElementById("institutionFilter");
+  const clearFiltersBtn = document.getElementById("clearFilters");
   const resultsCount = document.getElementById("resultsCount");
   const noResults = document.getElementById("noResults");
   const totalCarrerasEl = document.getElementById("totalCarreras");
 
   let activeCategory = "Todas";
+  let activeTitleType = "Todos";
+  let activeModality = "Todas";
+  let activeInstitution = "todas";
   let query = "";
 
   totalCarrerasEl.textContent = CAREERS.length;
+
+  /* ---------------------- Tipo de título y modalidad (derivados) ---------------------- */
+  function tipoTitulo(nombre) {
+    const n = nombre.toLowerCase();
+    if (n.startsWith("licenciatura")) return "Licenciatura";
+    if (n.startsWith("ingeniería") || n.startsWith("ingenieria")) return "Ingeniería";
+    if (n.startsWith("tecnicatura") || n.startsWith("técnico") || n.startsWith("tecnico")) return "Tecnicatura";
+    if (n.startsWith("profesorado")) return "Profesorado";
+    if (n.startsWith("analista universitario")) return "Analista Universitario";
+    if (n.startsWith("doctorado")) return "Posgrado";
+    return "Otros títulos";
+  }
+
+  // Siglo 21 es, en los datos de este sitio, la única institución 100% virtual;
+  // el resto dicta de forma presencial (algunas con opción virtual puntual ya
+  // aclarada en el campo modalidadInstituciones de esa carrera).
+  function institucionIds(career) {
+    return Array.isArray(career.institucion) ? career.institucion : (career.institucion ? [career.institucion] : []);
+  }
+  function esVirtual(career) { return institucionIds(career).includes("siglo21"); }
+  function esPresencial(career) { return institucionIds(career).some(id => id !== "siglo21"); }
 
   /* ---------------------- Instituciones ---------------------- */
   function institucionNombres(institucionField) {
@@ -50,11 +78,87 @@
     btn.setAttribute("role", "tab");
     btn.addEventListener("click", () => {
       activeCategory = cat;
-      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      chipsWrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
       btn.classList.add("active");
       renderGrid();
+      updateClearButton();
     });
     chipsWrap.appendChild(btn);
+  });
+
+  /* ---------------------- Chips de tipo de título ---------------------- */
+  const tiposTitulo = ["Todos", ...Array.from(new Set(CAREERS.map(c => tipoTitulo(c.nombre)))).sort((a,b)=>a.localeCompare(b,"es"))];
+
+  tiposTitulo.forEach(tipo => {
+    const btn = document.createElement("button");
+    btn.className = "chip" + (tipo === "Todos" ? " active" : "");
+    btn.textContent = tipo;
+    btn.setAttribute("role", "tab");
+    btn.addEventListener("click", () => {
+      activeTitleType = tipo;
+      titleChipsWrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      renderGrid();
+      updateClearButton();
+    });
+    titleChipsWrap.appendChild(btn);
+  });
+
+  /* ---------------------- Chips de modalidad ---------------------- */
+  const modalidades = ["Todas", "Presencial", "Virtual"];
+
+  modalidades.forEach(mod => {
+    const btn = document.createElement("button");
+    btn.className = "chip" + (mod === "Todas" ? " active" : "");
+    btn.textContent = mod;
+    btn.setAttribute("role", "tab");
+    btn.addEventListener("click", () => {
+      activeModality = mod;
+      modalityChipsWrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      renderGrid();
+      updateClearButton();
+    });
+    modalityChipsWrap.appendChild(btn);
+  });
+
+  /* ---------------------- Selector de institución/facultad ---------------------- */
+  const institucionesOrdenadas = Object.entries(INSTITUCIONES).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, "es"));
+  const optTodas = document.createElement("option");
+  optTodas.value = "todas";
+  optTodas.textContent = "Todas las instituciones";
+  institutionSelect.appendChild(optTodas);
+  institucionesOrdenadas.forEach(([id, inst]) => {
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = inst.nombre;
+    institutionSelect.appendChild(opt);
+  });
+  institutionSelect.addEventListener("change", (e) => {
+    activeInstitution = e.target.value;
+    renderGrid();
+    updateClearButton();
+  });
+
+  /* ---------------------- Limpiar filtros ---------------------- */
+  function updateClearButton() {
+    const hayFiltros = activeCategory !== "Todas" || activeTitleType !== "Todos" || activeModality !== "Todas" || activeInstitution !== "todas" || query !== "";
+    clearFiltersBtn.hidden = !hayFiltros;
+  }
+
+  clearFiltersBtn.addEventListener("click", () => {
+    activeCategory = "Todas";
+    activeTitleType = "Todos";
+    activeModality = "Todas";
+    activeInstitution = "todas";
+    query = "";
+    searchInput.value = "";
+    chipsWrap.querySelectorAll(".chip").forEach((c, i) => c.classList.toggle("active", i === 0));
+    titleChipsWrap.querySelectorAll(".chip").forEach((c, i) => c.classList.toggle("active", i === 0));
+    modalityChipsWrap.querySelectorAll(".chip").forEach((c, i) => c.classList.toggle("active", i === 0));
+    institutionSelect.value = "todas";
+    renderGrid();
+    updateClearButton();
   });
 
   /* ---------------------- Buscador ---------------------- */
@@ -64,6 +168,7 @@
     debounceTimer = setTimeout(() => {
       query = e.target.value.trim().toLowerCase();
       renderGrid();
+      updateClearButton();
     }, 140);
   });
 
@@ -71,9 +176,14 @@
   function filteredCareers() {
     return CAREERS.filter(c => {
       const matchesCategory = activeCategory === "Todas" || c.categoria === activeCategory;
+      const matchesTitleType = activeTitleType === "Todos" || tipoTitulo(c.nombre) === activeTitleType;
+      const matchesModality = activeModality === "Todas"
+        || (activeModality === "Presencial" && esPresencial(c))
+        || (activeModality === "Virtual" && esVirtual(c));
+      const matchesInstitution = activeInstitution === "todas" || institucionIds(c).includes(activeInstitution);
       const haystack = (c.nombre + " " + c.descripcionBreve + " " + c.categoria).toLowerCase();
       const matchesQuery = query === "" || haystack.includes(query);
-      return matchesCategory && matchesQuery;
+      return matchesCategory && matchesTitleType && matchesModality && matchesInstitution && matchesQuery;
     });
   }
 

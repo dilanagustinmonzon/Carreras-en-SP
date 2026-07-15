@@ -126,6 +126,15 @@ const INSTITUCIONES = {
     descripcion: "Institutos de gestión privada ubicados en Sáenz Peña, Chaco, que dictan tecnicaturas superiores en administración de empresas y en recursos humanos.",
     modalidad: "Presencial.",
     fuente: "No se encontró un sitio web oficial verificable; información basada en el nombre institucional y su categoría U.E.G.P."
+  },
+  "siglo21": {
+    nombre: "Universidad Siglo 21 — Centro de Apoyo Universitario (CAU) Sáenz Peña",
+    tipo: "Universidad privada, modalidad virtual/a distancia",
+    direccion: "Laprida 527, Presidencia Roque Sáenz Peña, Chaco",
+    web: "https://21.edu.ar",
+    descripcion: "Universidad privada con sede central en Córdoba, que dicta sus carreras de forma virtual en todo el país a través de Centros de Apoyo Universitario (CAU) regionales, donde los estudiantes pueden rendir exámenes, hacer trámites y recibir apoyo presencial. El CAU de Sáenz Peña funciona en Laprida 527.",
+    modalidad: "Virtual/a distancia, con apoyo presencial en el CAU local para exámenes, trámites y consultas. Las carreras con prácticas clínicas obligatorias (como Psicología o Nutrición) no se dictan a distancia; solo están habilitadas de forma virtual las carreras y Ciclos de Complementación Curricular (CCC) que no requieren práctica física diaria.",
+    fuente: "21.edu.ar (presencia territorial y oferta académica), julio 2026"
   }
 };
 
@@ -445,7 +454,8 @@ const CAREERS = [
     id: "abogacia",
     nombre: "Abogacía",
     categoria: "Humanidades y Ciencias Sociales",
-    institucion: "ucp",
+    institucion: ["ucp", "siglo21"],
+    modalidadInstituciones: "Presencial en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
     descripcionBreve: "Forma profesionales del derecho para asesorar, representar y litigar en todas las ramas jurídicas.",
     icono: "⚖️",
     investigado: true,
@@ -488,7 +498,8 @@ const CAREERS = [
     id: "contador-publico",
     nombre: "Contador Público",
     categoria: "Ciencias Económicas",
-    institucion: ["uncaus", "ucp"],
+    institucion: ["uncaus", "ucp", "siglo21"],
+    modalidadInstituciones: "Presencial en UNCAUS y en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
     descripcionBreve: "Forma profesionales en contabilidad, auditoría, impuestos y gestión financiera de empresas y organizaciones.",
     icono: "📈",
     investigado: true,
@@ -751,7 +762,8 @@ const CAREERS = [
     id: "licenciatura-en-comercio-internacional",
     nombre: "Licenciatura en Comercio Internacional",
     categoria: "Ciencias Económicas",
-    institucion: "ucp",
+    institucion: ["ucp", "siglo21"],
+    modalidadInstituciones: "Presencial en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
     descripcionBreve: "Forma profesionales para gestionar operaciones de importación, exportación y negocios internacionales.",
     icono: "🌎",
     investigado: true,
@@ -837,7 +849,8 @@ const CAREERS = [
     id: "licenciatura-en-administracion",
     nombre: "Licenciatura en Administración",
     categoria: "Ciencias Económicas",
-    institucion: "uncaus",
+    institucion: ["uncaus", "siglo21"],
+    modalidadInstituciones: "Presencial o virtual en UNCAUS (UNCAUS Virtual) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
     descripcionBreve: "Forma profesionales para la gestión integral de organizaciones públicas y privadas, con oferta también a distancia.",
     icono: "📋",
     investigado: true,
@@ -1891,7 +1904,8 @@ const CAREERS = [
     id: "licenciatura-en-psicopedagogia",
     nombre: "Licenciatura en Psicopedagogía",
     categoria: "Educación",
-    institucion: "ucp",
+    institucion: ["ucp", "siglo21"],
+    modalidadInstituciones: "Presencial en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña), ambas como Ciclo de Complementación Curricular",
     descripcionBreve: "Forma profesionales para el diagnóstico e intervención en procesos de aprendizaje, con perspectiva psicológica y pedagógica.",
     icono: "📚",
     investigado: true,
@@ -2642,9 +2656,89 @@ const CAREERS = [
 // ---------------------------------------------------------------------
 const PENDIENTES = [
   // [id, nombre, categoria, icono, duracionAnios, institucion]
-  // Todas las carreras de la lista original ya fueron investigadas a fondo
-  // y agregadas como objetos completos más arriba. Este array queda vacío,
-  // listo para usarse en el futuro si se agregan nuevas carreras rápidas.
+  // Todas las carreras de la lista original (55/56) ya fueron investigadas
+  // a fondo y agregadas como objetos completos más arriba.
+  //
+  // A partir de acá se suman las carreras de la Universidad Siglo 21 (CAU
+  // Sáenz Peña, modalidad virtual), agregadas el mismo día que se sumó la
+  // institución. Quedan en construcción (investigado: false) hasta que se
+  // investiguen a fondo en próximos lotes. El sufijo "-siglo21" en el id
+  // evita cualquier choque con carreras homónimas de otras instituciones
+  // (ej. "Abogacía" en UCP vs. "Abogacía" en Siglo 21).
+
+  // --- Lote Siglo 21 / A — Negocios, Finanzas y Management ---
+  ["licenciatura-en-comercializacion-marketing-siglo21", "Licenciatura en Comercialización - Marketing", "Ciencias Económicas", "📣", 4, "siglo21"],
+  ["licenciatura-en-finanzas-siglo21", "Licenciatura en Finanzas", "Ciencias Económicas", "💹", 4, "siglo21"],
+  ["licenciatura-en-gestion-de-rrhh-siglo21", "Licenciatura en Gestión de Recursos Humanos", "Ciencias Económicas", "🧑‍💼", 4, "siglo21"],
+  ["licenciatura-en-logistica-global-siglo21", "Licenciatura en Logística Global", "Ciencias Económicas", "🚚", 4, "siglo21"],
+  ["licenciatura-en-administracion-agraria-siglo21", "Licenciatura en Administración Agraria", "Ciencias Económicas", "🌾", 4, "siglo21"],
+  ["licenciatura-en-inteligencia-de-negocios-digitales-siglo21", "Licenciatura en Inteligencia de Negocios Digitales", "Ciencias Económicas", "📊", 4, "siglo21"],
+  ["licenciatura-en-antropologia-organizacional-siglo21", "Licenciatura en Antropología Organizacional", "Humanidades y Ciencias Sociales", "🧑‍🤝‍🧑", 4, "siglo21"],
+  ["licenciatura-en-negocios-inmobiliarios-ccc-siglo21", "Licenciatura en Desarrollo de Negocios Inmobiliarios (CCC)", "Ciencias Económicas", "🏘️", 2, "siglo21"],
+  ["actuario-siglo21", "Actuario", "Ciencias Económicas", "🧮", 4, "siglo21"],
+  ["martillero-corredor-publico-siglo21", "Martillero, Corredor Público y Corredor Inmobiliario", "Ciencias Económicas", "🔨", 2.5, "siglo21"],
+  ["tecnicatura-direccion-equipos-de-ventas-siglo21", "Tecnicatura en Dirección de Equipos de Ventas", "Tecnicaturas", "🛍️", 2, "siglo21"],
+  ["tecnicatura-gestion-empresas-familiares-siglo21", "Tecnicatura en Gestión de Empresas Familiares", "Tecnicaturas", "👨‍👩‍👧", 2, "siglo21"],
+  ["tecnicatura-responsabilidad-gestion-social-siglo21", "Tecnicatura en Responsabilidad y Gestión Social", "Tecnicaturas", "🤝", 2, "siglo21"],
+  ["tecnicatura-relaciones-laborales-siglo21", "Tecnicatura en Relaciones Laborales", "Tecnicaturas", "🧑‍💼", 2, "siglo21"],
+  ["tecnicatura-clima-laboral-siglo21", "Tecnicatura Universitaria en Gestión del Clima Laboral en la Organización", "Tecnicaturas", "🌤️", 2, "siglo21"],
+  ["tecnicatura-propiedad-horizontal-siglo21", "Tecnicatura Universitaria en Administración de la Propiedad Horizontal y Conjuntos Inmobiliarios", "Tecnicaturas", "🏢", 2, "siglo21"],
+
+  // --- Lote Siglo 21 / B — Derecho, Política y Ciencias Sociales + Criminología y Seguridad ---
+  ["escribania-siglo21", "Escribanía (para Abogados)", "Derecho y Seguridad", "🖋️", 1, "siglo21"],
+  ["procurador-siglo21", "Procurador", "Derecho y Seguridad", "📑", 3, "siglo21"],
+  ["licenciatura-ciencia-politica-gobierno-siglo21", "Licenciatura en Ciencia Política y Gobierno", "Humanidades y Ciencias Sociales", "🗳️", 4, "siglo21"],
+  ["licenciatura-relaciones-internacionales-siglo21", "Licenciatura en Relaciones Internacionales", "Humanidades y Ciencias Sociales", "🌐", 4, "siglo21"],
+  ["licenciatura-administracion-publica-siglo21", "Licenciatura en Administración Pública (Siglo 21)", "Ciencias Económicas", "🏛️", 4, "siglo21"],
+  ["tecnicatura-gestion-politicas-publicas-siglo21", "Tecnicatura Universitaria en Administración y Gestión de Políticas Públicas", "Tecnicaturas", "🏛️", 2, "siglo21"],
+  ["tecnicatura-gestion-tributaria-siglo21", "Tecnicatura en Administración y Gestión Tributaria", "Tecnicaturas", "🧾", 2, "siglo21"],
+  ["licenciatura-criminologia-seguridad-siglo21", "Licenciatura en Criminología y Seguridad", "Derecho y Seguridad", "🚨", 4, "siglo21"],
+  ["tecnicatura-escena-del-crimen-siglo21", "Tecnicatura en Investigación de la Escena del Crimen", "Tecnicaturas", "🔎", 2, "siglo21"],
+
+  // --- Lote Siglo 21 / C — Tecnología, Sistemas e Informática ---
+  ["licenciatura-informatica-siglo21", "Licenciatura en Informática", "Tecnología", "💻", 4, "siglo21"],
+  ["licenciatura-ciencia-de-datos-siglo21", "Licenciatura en Ciencia de Datos", "Tecnología", "📊", 4, "siglo21"],
+  ["licenciatura-seguridad-informatica-siglo21", "Licenciatura en Seguridad Informática", "Tecnología", "🔐", 4, "siglo21"],
+  ["licenciatura-ia-robotica-siglo21", "Licenciatura en Inteligencia Artificial y Robótica", "Tecnología", "🤖", 4, "siglo21"],
+  ["licenciatura-agroinformatica-siglo21", "Licenciatura en Agroinformática", "Tecnología", "🌱", 4, "siglo21"],
+  ["licenciatura-infraestructura-tecnologica-siglo21", "Licenciatura en Administración de Infraestructura Tecnológica", "Tecnología", "🖥️", 4, "siglo21"],
+  ["licenciatura-gestion-de-la-informacion-siglo21", "Licenciatura en Gestión de la Información", "Tecnología", "🗂️", 4, "siglo21"],
+  ["tecnicatura-redes-telecomunicaciones-siglo21", "Tecnicatura Universitaria en Redes Informáticas y Telecomunicaciones", "Tecnicaturas", "📡", 2, "siglo21"],
+  ["tecnicatura-estadistica-aplicada-siglo21", "Tecnicatura Universitaria en Estadística Aplicada y Análisis Avanzado", "Tecnicaturas", "📈", 2, "siglo21"],
+
+  // --- Lote Siglo 21 / D — Diseño, Comunicación y Moda ---
+  ["licenciatura-diseno-animacion-digital-siglo21", "Licenciatura en Diseño y Animación Digital", "Diseño y Comunicación", "🎨", 4, "siglo21"],
+  ["licenciatura-publicidad-siglo21", "Licenciatura en Publicidad", "Diseño y Comunicación", "📣", 4, "siglo21"],
+  ["licenciatura-periodismo-siglo21", "Licenciatura en Periodismo", "Diseño y Comunicación", "📰", 4, "siglo21"],
+  ["licenciatura-relaciones-publicas-siglo21", "Licenciatura en Relaciones Públicas e Institucionales", "Diseño y Comunicación", "🤝", 4, "siglo21"],
+  ["tecnicatura-diseno-animacion-digital-siglo21", "Tecnicatura Universitaria en Diseño y Animación Digital", "Tecnicaturas", "🎨", 2, "siglo21"],
+  ["tecnicatura-videojuegos-siglo21", "Tecnicatura Universitaria en Diseño y Desarrollo de Videojuegos", "Tecnicaturas", "🎮", 2, "siglo21"],
+  ["tecnicatura-gestion-de-moda-siglo21", "Tecnicatura Universitaria en Gestión de Moda", "Tecnicaturas", "👗", 2, "siglo21"],
+  ["tecnicatura-marketing-publicidad-digital-siglo21", "Tecnicatura Universitaria en Marketing y Publicidad Digital", "Tecnicaturas", "📱", 2, "siglo21"],
+  ["tecnicatura-protocolo-eventos-siglo21", "Tecnicatura en Dirección de Protocolo, Organización de Eventos y Relaciones Públicas", "Tecnicaturas", "🎉", 2, "siglo21"],
+
+  // --- Lote Siglo 21 / E — Educación + Salud y Bienestar Social ---
+  ["licenciatura-educacion-ccc-siglo21", "Licenciatura en Educación (CCC)", "Educación", "🎓", 2, "siglo21"],
+  ["licenciatura-educacion-nuevas-tecnologias-siglo21", "Licenciatura en Educación y Nuevas Tecnologías", "Educación", "🖥️", 4, "siglo21"],
+  ["profesorado-universitario-ccc-siglo21", "Profesorado Universitario para el Nivel Secundario y Superior (CCC)", "Educación", "🏫", 1.5, "siglo21"],
+  ["licenciatura-gerontologia-ccc-siglo21", "Licenciatura en Gerontología (CCC)", "Salud", "👵", 2, "siglo21"],
+  ["licenciatura-terapia-ocupacional-siglo21", "Licenciatura en Terapia Ocupacional y Desarrollo Humano", "Salud", "🧑‍⚕️", 4, "siglo21"],
+  ["licenciatura-administracion-servicios-salud-ccc-siglo21", "Licenciatura en Administración de Servicios de Salud (CCC)", "Salud", "🏥", 2, "siglo21"],
+  ["tecnicatura-gestion-administrativa-salud-siglo21", "Tecnicatura Universitaria en Gestión Administrativa de Servicios de Salud", "Tecnicaturas", "🏥", 2, "siglo21"],
+  ["tecnicatura-promocion-comunitaria-ninez-siglo21", "Tecnicatura Universitaria en Promoción Comunitaria en Niñez y Adolescencia", "Tecnicaturas", "🧒", 2, "siglo21"],
+
+  // --- Lote Siglo 21 / F — Sustentabilidad, Turismo y Agro ---
+  ["licenciatura-gestion-ambiental-siglo21", "Licenciatura en Gestión Ambiental (Siglo 21)", "Sustentabilidad y Turismo", "🌱", 4, "siglo21"],
+  ["licenciatura-ambiente-energias-renovables-siglo21", "Licenciatura en Ambiente y Energías Renovables", "Sustentabilidad y Turismo", "🔋", 4, "siglo21"],
+  ["licenciatura-gestion-turistica-siglo21", "Licenciatura en Gestión Turística", "Sustentabilidad y Turismo", "🧳", 4, "siglo21"],
+  ["licenciatura-administracion-hotelera-siglo21", "Licenciatura en Administración Hotelera", "Sustentabilidad y Turismo", "🏨", 4, "siglo21"],
+  ["licenciatura-higiene-seguridad-trabajo-siglo21", "Licenciatura en Higiene, Seguridad y Medio Ambiente del Trabajo", "Sustentabilidad y Turismo", "🦺", 4, "siglo21"],
+  ["licenciatura-hidrocarburos-geociencias-siglo21", "Licenciatura en Hidrocarburos y Geociencias", "Sustentabilidad y Turismo", "⛽", 4, "siglo21"],
+  ["tecnicatura-negocios-agroecologicos-siglo21", "Tecnicatura en Negocios Agroecológicos", "Tecnicaturas", "🌿", 2, "siglo21"],
+  ["tecnicatura-higiene-seguridad-laboral-siglo21", "Tecnicatura Universitaria en Higiene y Seguridad Laboral", "Tecnicaturas", "🦺", 2.5, "siglo21"],
+  ["tecnicatura-hidrocarburos-geociencia-siglo21", "Tecnicatura Universitaria en Hidrocarburos y Geociencia", "Tecnicaturas", "⛽", 2, "siglo21"],
+  ["tecnicatura-auditorias-ambientales-siglo21", "Tecnicatura Universitaria en Gestión y Auditorías Ambientales", "Tecnicaturas", "🌱", 2, "siglo21"],
+  ["tecnicatura-recursos-turisticos-siglo21", "Tecnicatura Universitaria en Gestión de Recursos Turísticos", "Tecnicaturas", "🗺️", 2, "siglo21"],
 ];
 
 PENDIENTES.forEach(([id, nombre, categoria, icono, duracionAnios, institucion]) => {

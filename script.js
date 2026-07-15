@@ -201,6 +201,7 @@
           <span class="detail-category">${c.categoria}</span>
           <h2 class="detail-title" id="detailTitle">${c.nombre}</h2>
           ${institucionNombres(c.institucion).length ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">${institucionNombres(c.institucion).map(n => `<span class="badge-institucion">🏛️ ${n}</span>`).join("")}</div>` : ""}
+          ${c.modalidadInstituciones ? `<p style="margin:8px 0 0;font-size:.82rem;color:var(--text-faint);">🧭 ${c.modalidadInstituciones}</p>` : ""}
         </div>
       </div>
 

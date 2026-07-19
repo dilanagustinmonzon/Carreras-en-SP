@@ -135,6 +135,15 @@ const INSTITUCIONES = {
     descripcion: "Universidad privada con sede central en Córdoba, que dicta sus carreras de forma virtual en todo el país a través de Centros de Apoyo Universitario (CAU) regionales, donde los estudiantes pueden rendir exámenes, hacer trámites y recibir apoyo presencial. El CAU de Sáenz Peña funciona en Laprida 527.",
     modalidad: "Virtual/a distancia, con apoyo presencial en el CAU local para exámenes, trámites y consultas. Las carreras con prácticas clínicas obligatorias (como Psicología o Nutrición) no se dictan a distancia; solo están habilitadas de forma virtual las carreras y Ciclos de Complementación Curricular (CCC) que no requieren práctica física diaria.",
     fuente: "21.edu.ar (presencia territorial y oferta académica), julio 2026"
+  },
+  "utn-frre": {
+    nombre: "Universidad Tecnológica Nacional — Facultad Regional Resistencia (UTN FRRE)",
+    tipo: "Universidad pública nacional",
+    direccion: "French 414 (CP H3500CHJ), Resistencia, Chaco",
+    web: "https://www.frre.utn.edu.ar",
+    descripcion: "Facultad Regional de la Universidad Tecnológica Nacional, fundada en 1960, con sede central en Resistencia (French 414) y un edificio anexo en French 802. Es la única universidad del país organizada íntegramente alrededor de la ingeniería, y tiene alcance regional en el NEA a través de extensiones áulicas en Formosa, Goya, Gobernador Virasoro e Ituzaingó (Corrientes) y Posadas (Misiones). Dicta carreras de grado, tecnicaturas universitarias, ciclos de licenciatura, diplomaturas y posgrados (algunos en conjunto con la UNNE y la Universidad Nacional de Misiones).",
+    modalidad: "Mixta: las carreras de grado (ingenierías y Licenciatura en Administración Rural) son presenciales en la sede de Resistencia. Las tecnicaturas universitarias son mayormente presenciales, dictadas en Resistencia y/o en extensiones áulicas de la región (Goya, Formosa, Posadas, Gobernador Virasoro, Ituzaingó), salvo la Tecnicatura Universitaria en Programación a Distancia (TUPaD). Los ciclos de licenciatura, diplomaturas y posgrados combinan modalidad virtual y presencial según la carrera.",
+    fuente: "frre.utn.edu.ar (institucional, académica y posgrados), notas de prensa de UTN Resistencia (Diario Chaco, Diario TAG, inChaco, ChacoDiaPorDia) y Wikipedia — julio 2026"
   }
 };
 
@@ -5382,6 +5391,233 @@ const CAREERS = [
     },
     pdfs: { plan: null, programa: null, info: null },
     faltaInvestigar: ["Cifras de sueldo específicas de esta tecnicatura en el mercado argentino."]
+  },
+
+  /* =================================================================
+     UTN FACULTAD REGIONAL RESISTENCIA (FRRE) — fichas base
+     Pendientes de investigación a fondo. NO inventar cifras: se
+     completan en próximos lotes. Estructura lista para usar.
+     ================================================================= */
+
+  {
+    ...CAREER_TEMPLATE,
+    id: "ingenieria-en-sistemas-de-informacion-utnfrre",
+    nombre: "Ingeniería en Sistemas de Información (UTN FRRE)",
+    categoria: "Ingeniería",
+    institucion: "utn-frre",
+    descripcionBreve: "Carrera de grado pública y gratuita, modalidad presencial, sede Resistencia (French 414). Duración de referencia: 5 años.",
+    icono: "💻",
+    duracionAnios: 5
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "ingenieria-electromecanica-utnfrre",
+    nombre: "Ingeniería Electromecánica (UTN FRRE)",
+    categoria: "Ingeniería",
+    institucion: "utn-frre",
+    descripcionBreve: "Carrera de grado pública y gratuita, modalidad presencial, sede Resistencia (French 414). Duración de referencia: 5 años.",
+    icono: "⚙️",
+    duracionAnios: 5
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "ingenieria-quimica-utnfrre",
+    nombre: "Ingeniería Química (UTN FRRE)",
+    categoria: "Ingeniería",
+    institucion: "utn-frre",
+    descripcionBreve: "Carrera de grado pública y gratuita, modalidad presencial, sede Resistencia (French 414). Duración de referencia: 5 años.",
+    icono: "🧪",
+    duracionAnios: 5
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "licenciatura-en-administracion-rural-utnfrre",
+    nombre: "Licenciatura en Administración Rural (UTN FRRE)",
+    categoria: "Ciencias Económicas",
+    institucion: "utn-frre",
+    descripcionBreve: "Carrera de grado pública y gratuita, modalidad presencial, sede Resistencia (French 414). Duración de referencia: 4 años.",
+    icono: "🌾",
+    duracionAnios: 4
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "tecnicatura-universitaria-en-programacion-utnfrre",
+    nombre: "Tecnicatura Universitaria en Programación (UTN FRRE)",
+    categoria: "Tecnicaturas",
+    institucion: "utn-frre",
+    descripcionBreve: "Pregrado de 2 años. Modalidad presencial en Resistencia, con extensiones áulicas en Goya y Formosa, y también en modalidad a distancia (TUPaD).",
+    icono: "👨‍💻",
+    duracionAnios: 2
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "tecnicatura-universitaria-en-mecatronica-utnfrre",
+    nombre: "Tecnicatura Universitaria en Mecatrónica (UTN FRRE)",
+    categoria: "Tecnicaturas",
+    institucion: "utn-frre",
+    descripcionBreve: "Pregrado de 2 años y medio. Modalidad presencial en Resistencia, con extensiones áulicas en Posadas, Goya y Gobernador Virasoro.",
+    icono: "🤖",
+    duracionAnios: 2.5
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "tecnicatura-universitaria-en-operacion-y-mantenimiento-de-redes-electricas-utnfrre",
+    nombre: "Tecnicatura Universitaria en Operación y Mantenimiento de Redes Eléctricas (UTN FRRE)",
+    categoria: "Tecnicaturas",
+    institucion: "utn-frre",
+    descripcionBreve: "Pregrado de 3 años. Modalidad presencial en Resistencia, con extensión áulica en Ituzaingó (Corrientes).",
+    icono: "🔌",
+    duracionAnios: 3
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "tecnicatura-universitaria-en-logistica-utnfrre",
+    nombre: "Tecnicatura Universitaria en Logística (UTN FRRE)",
+    categoria: "Tecnicaturas",
+    institucion: "utn-frre",
+    descripcionBreve: "Pregrado de 2 años, nueva propuesta de la Facultad para el ciclo 2026. Modalidad presencial en Resistencia.",
+    icono: "📦",
+    duracionAnios: 2
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "tecnicatura-universitaria-en-seguridad-vial-utnfrre",
+    nombre: "Tecnicatura Universitaria en Seguridad Vial (UTN FRRE)",
+    categoria: "Tecnicaturas",
+    institucion: "utn-frre",
+    descripcionBreve: "Pregrado orientado a peritaje, prevención y normativa de tránsito. Modalidad presencial en Resistencia.",
+    icono: "🚦",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "tecnicatura-universitaria-en-resolucion-pacifica-de-conflictos-utnfrre",
+    nombre: "Tecnicatura Universitaria en Resolución Pacífica de Conflictos (UTN FRRE)",
+    categoria: "Tecnicaturas",
+    institucion: "utn-frre",
+    descripcionBreve: "Pregrado orientado a mediación y gestión de conflictos en organizaciones. Modalidad a confirmar (presencial/virtual).",
+    icono: "🤝",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "licenciatura-en-tecnologia-educativa-utnfrre",
+    nombre: "Licenciatura en Tecnología Educativa — Ciclo de Complementación (UTN FRRE)",
+    categoria: "Educación",
+    institucion: "utn-frre",
+    descripcionBreve: "Ciclo de licenciatura de 2 años (con presentación de tesina) para profesores. Modalidad a confirmar (presencial/virtual).",
+    icono: "🖥️",
+    duracionAnios: 2
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "licenciatura-en-tecnologias-inclusivas-en-educacion-utnfrre",
+    nombre: "Licenciatura en Tecnologías Inclusivas en Educación — Ciclo de Complementación (UTN FRRE)",
+    categoria: "Educación",
+    institucion: "utn-frre",
+    descripcionBreve: "Ciclo de complementación curricular de 2 años para profesores de Educación Especial. Modalidad a confirmar (presencial/virtual).",
+    icono: "♿",
+    duracionAnios: 2
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "licenciatura-en-produccion-de-bioimagenes-utnfrre",
+    nombre: "Licenciatura en Producción de Bioimágenes — Ciclo de Complementación (UTN FRRE)",
+    categoria: "Salud",
+    institucion: "utn-frre",
+    descripcionBreve: "Ciclo de licenciatura de 2 años para técnicos/as radiólogos/as. Modalidad presencial, sede Resistencia.",
+    icono: "🩻",
+    duracionAnios: 2
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "licenciatura-en-higiene-y-seguridad-en-el-trabajo-utnfrre",
+    nombre: "Licenciatura en Higiene y Seguridad en el Trabajo — Ciclo de Complementación (UTN FRRE)",
+    categoria: "Sustentabilidad y Turismo",
+    institucion: "utn-frre",
+    descripcionBreve: "Ciclo de licenciatura de 2 años para técnicos/as en Higiene y Seguridad. Modalidad a confirmar (en la red UTN suele dictarse a distancia).",
+    icono: "🦺",
+    duracionAnios: 2
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "diplomatura-en-ensenanza-de-la-matematica-utnfrre",
+    nombre: "Diplomatura en Enseñanza de la Matemática (UTN FRRE)",
+    categoria: "Educación",
+    institucion: "utn-frre",
+    descripcionBreve: "Diplomatura universitaria de formación continua, modalidad virtual, dictada en el campus virtual de la Facultad.",
+    icono: "📐",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "diplomatura-en-tecnologia-inclusiva-en-educacion-utnfrre",
+    nombre: "Diplomatura en Tecnología Inclusiva en Educación (UTN FRRE)",
+    categoria: "Educación",
+    institucion: "utn-frre",
+    descripcionBreve: "Diplomatura universitaria de formación continua, modalidad virtual, dictada en el campus virtual de la Facultad.",
+    icono: "🧩",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "diplomatura-en-medioambiente-higiene-y-seguridad-utnfrre",
+    nombre: "Diplomatura en Medioambiente, Higiene y Seguridad (UTN FRRE)",
+    categoria: "Sustentabilidad y Turismo",
+    institucion: "utn-frre",
+    descripcionBreve: "Diplomatura universitaria de formación continua, modalidad virtual.",
+    icono: "🌎",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "doctorado-en-informatica-utnfrre",
+    nombre: "Doctorado en Informática (UTN FRRE)",
+    categoria: "Posgrado",
+    institucion: "utn-frre",
+    descripcionBreve: "Posgrado de cuarto nivel dictado en conjunto por UTN FRRE, la UNNE y la Universidad Nacional de Misiones. Para graduados universitarios.",
+    icono: "🎓",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "maestria-en-administracion-de-negocios-mba-utnfrre",
+    nombre: "Maestría en Administración de Negocios (MBA) (UTN FRRE)",
+    categoria: "Posgrado",
+    institucion: "utn-frre",
+    descripcionBreve: "Posgrado de cuarto nivel para graduados universitarios.",
+    icono: "💼",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "maestria-en-ingenieria-en-calidad-utnfrre",
+    nombre: "Maestría en Ingeniería en Calidad (UTN FRRE)",
+    categoria: "Posgrado",
+    institucion: "utn-frre",
+    descripcionBreve: "Posgrado de cuarto nivel para graduados universitarios.",
+    icono: "📈",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "especializacion-en-ingenieria-gerencial-utnfrre",
+    nombre: "Especialización en Ingeniería Gerencial (UTN FRRE)",
+    categoria: "Posgrado",
+    institucion: "utn-frre",
+    descripcionBreve: "Posgrado de cuarto nivel para graduados universitarios. Es una de las carreras de posgrado históricas de la Facultad (desde la década de 1990).",
+    icono: "📊",
+    duracionAnios: null
+  },
+  {
+    ...CAREER_TEMPLATE,
+    id: "especializacion-en-higiene-y-seguridad-en-el-trabajo-utnfrre",
+    nombre: "Especialización en Higiene y Seguridad en el Trabajo (UTN FRRE)",
+    categoria: "Posgrado",
+    institucion: "utn-frre",
+    descripcionBreve: "Posgrado de cuarto nivel para graduados universitarios (ingenieros, arquitectos y profesionales afines). Cursado en 4 semestres.",
+    icono: "🦺",
+    duracionAnios: null
   },
 ];
 

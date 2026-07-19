@@ -19,6 +19,14 @@
    3. En el objeto de esa carrera, poné el nombre del archivo en
       pdfs.plan / pdfs.programa / pdfs.info (o dejalo en null si
       todavía no existe: se va a mostrar "Próximamente disponible").
+   CÓMO FUSIONAR UNA CARRERA QUE SE DICTA EN VARIAS INSTITUCIONES:
+   1. Dejá UNA sola ficha para esa carrera (borrá las otras).
+   2. Poné institucion como array, ej: institucion: ["uncaus", "utn-frre"].
+   3. Agregá (o completá) modalidadInstituciones, ej: "Presencial en
+      UNCAUS · Presencial en UTN FRRE".
+   4. Agregá duracionInstituciones con los años reales en cada una, ej:
+      "5 años en UNCAUS · 5 años en UTN FRRE". (duracionAnios queda
+      como referencia general/la más común.)
    ===================================================================== */
 
 const CAREER_TEMPLATE = {
@@ -157,10 +165,12 @@ const CAREERS = [
     id: "ingenieria-en-sistemas-de-informacion",
     nombre: "Ingeniería en Sistemas de Información",
     categoria: "Ingeniería",
-    descripcionBreve: "Diseña, desarrolla y gestiona software y sistemas informáticos para empresas y organismos.",
+    descripcionBreve: "Diseña, desarrolla y gestiona software y sistemas informáticos para empresas y organismos. Se dicta en UNCAUS (5 años) y en UTN FRRE (5 años, modalidad presencial).",
     icono: "💻",
     investigado: true,
-    institucion: "uncaus",
+    institucion: ["uncaus", "utn-frre"],
+    modalidadInstituciones: "Presencial en UNCAUS · Presencial en UTN Facultad Regional Resistencia (French 414)",
+    duracionInstituciones: "5 años en UNCAUS · 5 años en UTN FRRE",
     duracionAnios: 5,
     cargaHoraria: "Aprox. 3.400–3.600 horas cátedra totales según plan de estudios (varía por universidad).",
     queHace: "Diseña, desarrolla, implementa y mantiene sistemas de software, bases de datos, redes e infraestructura tecnológica. Participa en todo el ciclo de vida del software: análisis de requerimientos, arquitectura, programación, testing, despliegue y mantenimiento.",
@@ -193,7 +203,7 @@ const CAREERS = [
       nota: "Los valores varían MUCHO según si el empleador es nacional o extranjero (en este último caso suele cobrarse en dólares, lo que eleva fuertemente el equivalente en pesos). Se muestra un rango amplio porque las fuentes difieren entre sí."
     },
     pdfs: { plan: "plan-de-estudios.pdf", programa: null, info: null },
-    faltaInvestigar: []
+    faltaInvestigar: ["Confirmar si el plan de estudios, materias y salidas laborales de UTN FRRE tienen diferencias puntuales respecto del de UNCAUS (por ahora la ficha usa los datos de UNCAUS como base para ambas)."]
   },
 
   {
@@ -329,10 +339,12 @@ const CAREERS = [
     id: "ingenieria-quimica",
     nombre: "Ingeniería Química",
     categoria: "Ingeniería",
-    descripcionBreve: "Diseña y opera procesos industriales que transforman materias primas en productos químicos, energéticos o de consumo.",
+    descripcionBreve: "Diseña y opera procesos industriales que transforman materias primas en productos químicos, energéticos o de consumo. Se dicta en UNCAUS (5 años) y en UTN FRRE (5 años, modalidad presencial).",
     icono: "🧪",
     investigado: true,
-    institucion: "uncaus",
+    institucion: ["uncaus", "utn-frre"],
+    modalidadInstituciones: "Presencial en UNCAUS · Presencial en UTN Facultad Regional Resistencia (French 414)",
+    duracionInstituciones: "5 años en UNCAUS · 5 años en UTN FRRE",
     duracionAnios: 5,
     cargaHoraria: null,
     queHace: "Diseña, opera y optimiza plantas y procesos industriales donde ocurren transformaciones químicas o físico-químicas: refinerías, plantas petroquímicas, industria farmacéutica, alimenticia, de fertilizantes, entre otras.",
@@ -365,7 +377,7 @@ const CAREERS = [
       nota: "Fuente muy dispar: algunos relevamientos de grandes industrias petroquímicas muestran cifras varias veces más altas que el promedio general. Se optó por mostrar el rango más representativo del mercado general, no el de las multinacionales top."
     },
     pdfs: { plan: "plan-de-estudios.pdf", programa: null, info: null },
-    faltaInvestigar: []
+    faltaInvestigar: ["Confirmar si el plan de estudios, materias y salidas laborales de UTN FRRE tienen diferencias puntuales respecto del de UNCAUS (por ahora la ficha usa los datos de UNCAUS como base para ambas)."]
   },
 
   {
@@ -465,6 +477,7 @@ const CAREERS = [
     categoria: "Humanidades y Ciencias Sociales",
     institucion: ["ucp", "siglo21"],
     modalidadInstituciones: "Presencial en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
+    duracionInstituciones: "6 años en UCP · 4 años en Siglo 21",
     descripcionBreve: "Forma profesionales del derecho para asesorar, representar y litigar en todas las ramas jurídicas.",
     icono: "⚖️",
     investigado: true,
@@ -509,6 +522,7 @@ const CAREERS = [
     categoria: "Ciencias Económicas",
     institucion: ["uncaus", "ucp", "siglo21"],
     modalidadInstituciones: "Presencial en UNCAUS y en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
+    duracionInstituciones: "5 años en UNCAUS · 5 años en UCP · 4 años en Siglo 21",
     descripcionBreve: "Forma profesionales en contabilidad, auditoría, impuestos y gestión financiera de empresas y organizaciones.",
     icono: "📈",
     investigado: true,
@@ -773,6 +787,7 @@ const CAREERS = [
     categoria: "Ciencias Económicas",
     institucion: ["ucp", "siglo21"],
     modalidadInstituciones: "Presencial en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
+    duracionInstituciones: "4 años en UCP · 4 años en Siglo 21",
     descripcionBreve: "Forma profesionales para gestionar operaciones de importación, exportación y negocios internacionales.",
     icono: "🌎",
     investigado: true,
@@ -860,6 +875,7 @@ const CAREERS = [
     categoria: "Ciencias Económicas",
     institucion: ["uncaus", "siglo21"],
     modalidadInstituciones: "Presencial o virtual en UNCAUS (UNCAUS Virtual) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña)",
+    duracionInstituciones: "4 años en UNCAUS · 4 años en Siglo 21",
     descripcionBreve: "Forma profesionales para la gestión integral de organizaciones públicas y privadas, con oferta también a distancia.",
     icono: "📋",
     investigado: true,
@@ -1915,6 +1931,7 @@ const CAREERS = [
     categoria: "Educación",
     institucion: ["ucp", "siglo21"],
     modalidadInstituciones: "Presencial en Universidad de la Cuenca del Plata (UCP) · Virtual en Universidad Siglo 21 (CAU Sáenz Peña), ambas como Ciclo de Complementación Curricular",
+    duracionInstituciones: "5 años en UCP · 2 años en Siglo 21 (Ciclo de Complementación Curricular)",
     descripcionBreve: "Forma profesionales para el diagnóstico e intervención en procesos de aprendizaje, con perspectiva psicológica y pedagógica.",
     icono: "📚",
     investigado: true,
@@ -1950,7 +1967,7 @@ const CAREERS = [
       nota: "Fuente con pocas muestras y gran dispersión interna; los valores más bajos suelen corresponder a cargos en relación de dependencia en escuelas, mientras que el ejercicio en consultorio propio con cartera de pacientes consolidada puede ser bastante superior."
     },
     pdfs: { plan: null, programa: null, info: null },
-    faltaInvestigar: []
+    faltaInvestigar: ["Confirmar con fuente oficial la duración exacta del Ciclo de Complementación Curricular en cada institución (se estimó 2 años para Siglo 21 por ser el estándar de sus CCC; UCP se tomó como el valor general de duracionAnios ya investigado)."]
   },
 
   {
@@ -2177,6 +2194,7 @@ const CAREERS = [
     nombre: "Tecnicatura Superior en Administración de Recursos Humanos",
     categoria: "Tecnicaturas",
     institucion: ["nuestra-senora-misericordia", "otras-privadas"],
+    duracionInstituciones: "3 años en Instituto Nuestra Señora de la Misericordia · 3 años en institutos privados U.E.G.P. N° 82 / N° 193",
     descripcionBreve: "Formación técnica para la gestión de personal: selección, capacitación y administración de recursos humanos en organizaciones.",
     icono: "🧑‍💼",
     investigado: true,
@@ -5397,18 +5415,14 @@ const CAREERS = [
      UTN FACULTAD REGIONAL RESISTENCIA (FRRE) — fichas base
      Pendientes de investigación a fondo. NO inventar cifras: se
      completan en próximos lotes. Estructura lista para usar.
+
+     Nota: Ingeniería en Sistemas de Información e Ingeniería Química
+     NO tienen ficha propia acá porque también se dictan en UNCAUS:
+     están fusionadas en esas fichas (ver institucion: [], modalidadInstituciones
+     y duracionInstituciones en "ingenieria-en-sistemas-de-informacion"
+     e "ingenieria-quimica", más arriba en este archivo).
      ================================================================= */
 
-  {
-    ...CAREER_TEMPLATE,
-    id: "ingenieria-en-sistemas-de-informacion-utnfrre",
-    nombre: "Ingeniería en Sistemas de Información (UTN FRRE)",
-    categoria: "Ingeniería",
-    institucion: "utn-frre",
-    descripcionBreve: "Carrera de grado pública y gratuita, modalidad presencial, sede Resistencia (French 414). Duración de referencia: 5 años.",
-    icono: "💻",
-    duracionAnios: 5
-  },
   {
     ...CAREER_TEMPLATE,
     id: "ingenieria-electromecanica-utnfrre",
@@ -5417,16 +5431,6 @@ const CAREERS = [
     institucion: "utn-frre",
     descripcionBreve: "Carrera de grado pública y gratuita, modalidad presencial, sede Resistencia (French 414). Duración de referencia: 5 años.",
     icono: "⚙️",
-    duracionAnios: 5
-  },
-  {
-    ...CAREER_TEMPLATE,
-    id: "ingenieria-quimica-utnfrre",
-    nombre: "Ingeniería Química (UTN FRRE)",
-    categoria: "Ingeniería",
-    institucion: "utn-frre",
-    descripcionBreve: "Carrera de grado pública y gratuita, modalidad presencial, sede Resistencia (French 414). Duración de referencia: 5 años.",
-    icono: "🧪",
     duracionAnios: 5
   },
   {

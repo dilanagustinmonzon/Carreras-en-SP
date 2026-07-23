@@ -461,6 +461,8 @@
       card.setAttribute("role", "button");
       card.setAttribute("aria-label", "Ver información de " + career.nombre);
 
+      const inCompare = isInCompare(career.id);
+
       card.innerHTML = `
         <div class="card-top">
           <span class="card-icon" aria-hidden="true">${career.icono}</span>
@@ -473,13 +475,26 @@
           ${!career.investigado ? `<span class="badge-unverified">En construcción</span>` : ""}
         </div>
         ${institucionNombres(career.institucion).length ? `<div class="card-meta">${institucionNombres(career.institucion).map(n => `<span class="badge-institucion">🏛️ ${n}</span>`).join("")}</div>` : ""}
-        <span class="card-cta">Ver información
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </span>
+        <div class="card-actions">
+          <button type="button" class="compare-toggle-btn${inCompare ? " active" : ""}" data-id="${career.id}" aria-pressed="${inCompare ? "true" : "false"}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span class="compare-toggle-label">${inCompare ? "En comparación" : "Comparar"}</span>
+          </button>
+          <span class="card-cta">Ver información
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </div>
       `;
 
       card.addEventListener("click", () => openDetail(career.id));
       card.addEventListener("keypress", (e) => { if (e.key === "Enter") openDetail(career.id); });
+
+      const compareBtn = card.querySelector(".compare-toggle-btn");
+      compareBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleCompare(career.id);
+      });
+      compareBtn.addEventListener("keypress", (e) => e.stopPropagation());
 
       grid.appendChild(card);
     });
@@ -724,6 +739,237 @@
     const hash = location.hash.replace("#", "");
     if (hash && CAREERS.some(c => c.id === hash)) openDetail(hash);
   });
+
+  /* ---------------------- Comparador de carreras ---------------------- */
+  const MAX_COMPARE = 3;
+  const COMPARE_KEY = "ov-compare";
+
+  const compareBar = document.getElementById("compareBar");
+  const compareBarList = document.getElementById("compareBarList");
+  const compareBarCount = document.getElementById("compareBarCount");
+  const compareBarOpenBtn = document.getElementById("compareBarOpen");
+  const compareBarClearBtn = document.getElementById("compareBarClear");
+  const compareOverlay = document.getElementById("compareOverlay");
+  const compareContent = document.getElementById("compareContent");
+  const closeCompareBtn = document.getElementById("closeCompare");
+
+  let compareList = [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(COMPARE_KEY) || "[]");
+    if (Array.isArray(saved)) compareList = saved.filter(id => CAREERS.some(c => c.id === id)).slice(0, MAX_COMPARE);
+  } catch (e) { /* modo privado: se ignora */ }
+
+  function isInCompare(id) { return compareList.includes(id); }
+
+  function saveCompareList() {
+    try { localStorage.setItem(COMPARE_KEY, JSON.stringify(compareList)); } catch (e) { /* modo privado */ }
+  }
+
+  function syncCompareButtons() {
+    document.querySelectorAll(".compare-toggle-btn").forEach((btn) => {
+      const active = isInCompare(btn.dataset.id);
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+      const label = btn.querySelector(".compare-toggle-label");
+      if (label) label.textContent = active ? "En comparación" : "Comparar";
+    });
+  }
+
+  function toggleCompare(id) {
+    const idx = compareList.indexOf(id);
+    if (idx > -1) {
+      compareList.splice(idx, 1);
+    } else {
+      if (compareList.length >= MAX_COMPARE) {
+        showToast(`Podés comparar hasta ${MAX_COMPARE} carreras a la vez. Sacá una para agregar otra.`);
+        return;
+      }
+      compareList.push(id);
+    }
+    saveCompareList();
+    syncCompareButtons();
+    renderCompareBar();
+    if (compareOverlay.classList.contains("open")) renderCompareContent();
+  }
+
+  function renderCompareBar() {
+    const careers = compareList.map(id => CAREERS.find(c => c.id === id)).filter(Boolean);
+    compareBarList.innerHTML = careers.map(c => `
+      <div class="compare-chip" data-id="${c.id}">
+        <span class="compare-chip-icon" aria-hidden="true">${c.icono}</span>
+        <span class="compare-chip-name">${c.nombre}</span>
+        <button type="button" class="compare-chip-remove" data-id="${c.id}" aria-label="Quitar ${c.nombre} de la comparación">✕</button>
+      </div>
+    `).join("");
+    compareBarCount.textContent = `(${careers.length})`;
+    compareBarOpenBtn.disabled = careers.length < 2;
+    const visible = careers.length > 0;
+    compareBar.classList.toggle("visible", visible);
+    compareBar.setAttribute("aria-hidden", visible ? "false" : "true");
+    document.body.classList.toggle("has-compare-bar", visible);
+  }
+
+  compareBarList.addEventListener("click", (e) => {
+    const btn = e.target.closest(".compare-chip-remove");
+    if (btn) toggleCompare(btn.dataset.id);
+  });
+
+  compareBarClearBtn.addEventListener("click", () => {
+    compareList = [];
+    saveCompareList();
+    syncCompareButtons();
+    renderCompareBar();
+    if (compareOverlay.classList.contains("open")) renderCompareContent();
+  });
+
+  compareBarOpenBtn.addEventListener("click", () => openCompare());
+
+  function truncateText(text, n) {
+    if (!text || !text.trim()) return "Información no disponible";
+    return text.length > n ? text.slice(0, n).trim() + "…" : text;
+  }
+
+  function compactListText(items, limit) {
+    limit = limit || 4;
+    if (!items || items.length === 0) return "Información no disponible";
+    const shown = items.slice(0, limit).join(" · ");
+    const rest = items.length - limit;
+    return rest > 0 ? shown + ` (+${rest} más)` : shown;
+  }
+
+  function modalidadTexto(c) {
+    if (c.modalidadInstituciones) return c.modalidadInstituciones;
+    const virtual = esVirtual(c), presencial = esPresencial(c);
+    if (virtual && presencial) return "Presencial y virtual";
+    if (virtual) return "Virtual";
+    if (presencial) return "Presencial";
+    return "No disponible";
+  }
+
+  const COMPARE_ROWS = [
+    { label: "Institución", get: c => institucionNombres(c.institucion).join(" · ") || "No disponible" },
+    { label: "Modalidad", get: modalidadTexto },
+    { label: "Tipo de título", get: c => tipoTitulo(c.nombre) },
+    { label: "Duración", get: c => c.duracionInstituciones || (c.duracionAnios ? c.duracionAnios + " años" : "No disponible") },
+    { label: "Carga horaria", get: c => c.cargaHoraria || "No disponible" },
+    { label: "Dificultad", get: c => c.dificultad || "No disponible" },
+    { label: "Perfil recomendado", get: c => truncateText(c.perfilRecomendado, 140) },
+    { label: "Habilidades clave", get: c => compactListText(c.habilidades) },
+    { label: "Salidas laborales", get: c => compactListText(c.salidasLaborales) },
+    { label: "Sueldo junior", get: c => (c.salario && c.salario.junior) || "No disponible" },
+    { label: "Sueldo semi senior", get: c => (c.salario && c.salario.semiSenior) || "No disponible" },
+    { label: "Sueldo senior", get: c => (c.salario && c.salario.senior) || "No disponible" },
+    { label: "Trabajo remoto", get: c => truncateText(c.trabajoRemoto, 100) },
+    { label: "Demanda actual", get: c => truncateText(c.demandaActual, 120) }
+  ];
+
+  function buildCompareHTML(careers) {
+    const theadCols = careers.map(c => `
+      <th>
+        <div class="compare-col-head">
+          <div class="compare-col-head-top">
+            <span class="compare-col-icon" aria-hidden="true">${c.icono}</span>
+            <button type="button" class="compare-remove-btn" data-id="${c.id}" aria-label="Quitar ${c.nombre} de la comparación">✕</button>
+          </div>
+          <strong>${c.nombre}</strong>
+          <span class="compare-col-category">${c.categoria}</span>
+        </div>
+      </th>
+    `).join("");
+
+    const rows = COMPARE_ROWS.map(row => `
+      <tr>
+        <td class="compare-row-label">${row.label}</td>
+        ${careers.map(c => `<td>${row.get(c)}</td>`).join("")}
+      </tr>
+    `).join("");
+
+    const footerRow = `
+      <tr class="compare-footer-row">
+        <td class="compare-row-label"></td>
+        ${careers.map(c => `<td><button type="button" class="compare-view-btn" data-id="${c.id}">Ver ficha completa →</button></td>`).join("")}
+      </tr>
+    `;
+
+    return `
+      <div class="compare-header">
+        <p class="compare-eyebrow">Comparador de carreras</p>
+        <h2>Comparando ${careers.length} carreras</h2>
+        <p class="compare-scroll-hint">Deslizá hacia los costados para ver todas las columnas →</p>
+      </div>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead><tr><th class="compare-row-label"></th>${theadCols}</tr></thead>
+          <tbody>${rows}${footerRow}</tbody>
+        </table>
+      </div>
+      <div class="compare-actions-bottom">
+        <button type="button" class="compare-clear-all-btn" id="compareClearAllBtn">Vaciar comparación</button>
+      </div>
+    `;
+  }
+
+  function renderCompareContent() {
+    const careers = compareList.map(id => CAREERS.find(c => c.id === id)).filter(Boolean);
+
+    if (careers.length < 2) {
+      compareContent.innerHTML = `
+        <div class="compare-empty">
+          <span class="compare-empty-icon" aria-hidden="true">⚖️</span>
+          <h2>Elegí al menos 2 carreras para comparar</h2>
+          <p>Volvé al listado y tocá el botón <strong>"Comparar"</strong> en las carreras que te interesan (hasta ${MAX_COMPARE} a la vez).</p>
+          <button type="button" class="compare-empty-back-btn" id="compareEmptyBack">Ver carreras</button>
+        </div>
+      `;
+      document.getElementById("compareEmptyBack").addEventListener("click", closeCompare);
+      return;
+    }
+
+    compareContent.innerHTML = buildCompareHTML(careers);
+
+    compareContent.querySelectorAll(".compare-remove-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        toggleCompare(btn.dataset.id);
+        renderCompareContent();
+      });
+    });
+    compareContent.querySelectorAll(".compare-view-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.id;
+        closeCompare();
+        setTimeout(() => openDetail(id), 300);
+      });
+    });
+    const clearAllBtn = document.getElementById("compareClearAllBtn");
+    if (clearAllBtn) {
+      clearAllBtn.addEventListener("click", () => {
+        compareList = [];
+        saveCompareList();
+        syncCompareButtons();
+        renderCompareBar();
+        renderCompareContent();
+      });
+    }
+  }
+
+  function openCompare() {
+    renderCompareContent();
+    compareOverlay.classList.add("open");
+    compareOverlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    compareOverlay.scrollTop = 0;
+  }
+
+  function closeCompare() {
+    compareOverlay.classList.remove("open");
+    compareOverlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  closeCompareBtn.addEventListener("click", closeCompare);
+  compareOverlay.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCompare(); });
+
+  renderCompareBar();
 
   /* ---------------------- Tema claro/oscuro ---------------------- */
   const themeToggle = document.getElementById("themeToggle");

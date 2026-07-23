@@ -182,6 +182,29 @@
 <!-- ============ TOAST (compartir / avisos) ============ -->
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<!-- ============ BARRA FLOTANTE DE COMPARACIÓN ============ -->
+<div id="compareBar" class="compare-bar" aria-hidden="true">
+  <div class="compare-bar-inner">
+    <div id="compareBarList" class="compare-bar-list"></div>
+    <div class="compare-bar-actions">
+      <button id="compareBarClear" class="compare-bar-clear" type="button">Vaciar</button>
+      <button id="compareBarOpen" class="compare-bar-open" type="button">
+        Comparar <span id="compareBarCount">(0)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PANEL DE COMPARACIÓN (overlay) ============ -->
+<div id="compareOverlay" class="detail-overlay compare-overlay" aria-hidden="true">
+  <div class="detail-panel">
+    <div class="detail-panel-inner compare-panel-inner">
+      <button id="closeCompare" class="detail-close" aria-label="Cerrar">✕ Volver</button>
+      <div id="compareContent"><!-- se completa dinámicamente con JS --></div>
+    </div>
+  </div>
+</div>
+
 <!-- ============ FOOTER ============ -->
 <footer class="site-footer">
   <div class="container footer-inner">
@@ -199,7 +222,7 @@
   <p class="footer-copy">Proyecto educativo sin fines de lucro. Hecho con HTML, CSS y JavaScript puro.</p>
 
   <div class="credits-box">
-    <p class="credits-version">Versión 7.5</p>
+    <p class="credits-version">Versión 7.6</p>
     <p class="credits-text">Desarrollado por <strong>Monzón Dilan Agustín</strong>, con la asistencia de Claude (Anthropic).</p>
     <p class="credits-text">Este proyecto va a seguir recibiendo actualizaciones: más carreras, facultades y planes de estudio, y nuevas funciones para que sea cada vez más útil.</p>
   </div>

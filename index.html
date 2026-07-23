@@ -7,6 +7,14 @@
 <meta name="description" content="Guía interactiva para estudiantes secundarios sobre las carreras universitarias: qué hacen, cuánto se gana, salidas laborales y planes de estudio para descargar.">
 <meta name="theme-color" content="#0E1420">
 
+<!-- ============ PWA (instalable + funciona sin conexión) ============ -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Orientación Voc.">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
 <!-- Open Graph / redes sociales -->
 <meta property="og:title" content="Orientación Vocacional | Elegí tu carrera">
 <meta property="og:description" content="Conocé en profundidad las carreras universitarias: qué hacen, cuánto ganan y qué salidas laborales tienen en Argentina.">
@@ -40,6 +48,10 @@
     </nav>
 
     <div class="header-actions">
+      <button id="installAppBtn" class="icon-btn install-app-btn" title="Instalar app" aria-label="Instalar aplicación" hidden>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 19h14"/></svg>
+        <span class="install-app-label">Instalar app</span>
+      </button>
       <button id="shareBtn" class="icon-btn" title="Compartir esta página" aria-label="Compartir">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>
       </button>
@@ -222,7 +234,7 @@
   <p class="footer-copy">Proyecto educativo sin fines de lucro. Hecho con HTML, CSS y JavaScript puro.</p>
 
   <div class="credits-box">
-    <p class="credits-version">Versión 7.6</p>
+    <p class="credits-version">Versión 7.7</p>
     <p class="credits-text">Desarrollado por <strong>Monzón Dilan Agustín</strong>, con la asistencia de Claude (Anthropic).</p>
     <p class="credits-text">Este proyecto va a seguir recibiendo actualizaciones: más carreras, facultades y planes de estudio, y nuevas funciones para que sea cada vez más útil.</p>
   </div>
@@ -231,5 +243,12 @@
 <script src="careers-data.js"></script>
 <script src="pdfs-data.js"></script>
 <script src="script.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => { /* si falla, el sitio sigue funcionando online normalmente */ });
+    });
+  }
+</script>
 </body>
 </html>

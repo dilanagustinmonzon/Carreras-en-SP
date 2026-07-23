@@ -140,6 +140,18 @@ button { font-family: var(--font-body); cursor: pointer; }
 .icon-btn:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); }
 .icon-btn:active { transform: translateY(0); }
 
+.install-app-btn {
+  width: auto;
+  border-radius: 999px;
+  padding: 0 14px;
+  gap: 7px;
+}
+.install-app-label { font-size: .82rem; font-weight: 600; white-space: nowrap; }
+@media (max-width: 480px) {
+  .install-app-label { display: none; }
+  .install-app-btn { width: 40px; padding: 0; }
+}
+
 @media (max-width: 780px) {
   .main-nav { display: none; }
 }
@@ -631,6 +643,29 @@ button { font-family: var(--font-body); cursor: pointer; }
 .detail-title { font-size: clamp(1.6rem, 4vw, 2.3rem); margin-bottom: 6px; }
 .detail-category { font-family: var(--font-mono); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); }
 
+.detail-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 6px;
+}
+.quick-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: .86rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.quick-action-btn:hover { border-color: var(--accent); transform: translateY(-2px); color: var(--accent); }
+.quick-action-btn svg { flex-shrink: 0; }
+
 .detail-unverified-banner {
   margin: 22px 0;
   padding: 16px 20px;
@@ -1049,6 +1084,8 @@ body.has-compare-bar .back-to-top { bottom: 96px; }
   .detail-title { font-size: 1.5rem; }
   .detail-stats { grid-template-columns: 1fr 1fr; }
   .detail-close { width: 100%; text-align: center; }
+  .detail-quick-actions { flex-direction: column; }
+  .quick-action-btn { width: 100%; justify-content: center; padding: 13px 16px; }
 
   /* Sueldos y descargas: una columna, botones grandes y fáciles de tocar */
   .salary-grid { grid-template-columns: 1fr; }

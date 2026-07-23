@@ -591,6 +591,17 @@
         </div>
       </div>
 
+      <div class="detail-quick-actions">
+        <button type="button" id="speakBtn" class="quick-action-btn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          <span id="speakBtnLabel">Escuchar esta ficha</span>
+        </button>
+        <button type="button" id="downloadPdfBtn" class="quick-action-btn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 19h14"/></svg>
+          <span id="downloadPdfBtnLabel">Descargar ficha en PDF</span>
+        </button>
+      </div>
+
       ${!c.investigado ? `
         <div class="detail-unverified-banner">
           <strong>Ficha en construcción.</strong> Todavía no se investigó esta carrera a fondo con fuentes verificadas de Argentina.
@@ -716,6 +727,20 @@
       </div>
     `;
 
+    stopSpeech();
+    const speakBtn = document.getElementById("speakBtn");
+    const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+    if (speakBtn) {
+      if (!("speechSynthesis" in window)) {
+        speakBtn.hidden = true;
+      } else {
+        speakBtn.addEventListener("click", () => toggleSpeech(c));
+      }
+    }
+    if (downloadPdfBtn) {
+      downloadPdfBtn.addEventListener("click", () => downloadCareerPdf(c));
+    }
+
     overlay.classList.add("open");
     overlay.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
@@ -724,6 +749,7 @@
   }
 
   function closeDetail() {
+    stopSpeech();
     overlay.classList.remove("open");
     overlay.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
@@ -739,6 +765,176 @@
     const hash = location.hash.replace("#", "");
     if (hash && CAREERS.some(c => c.id === hash)) openDetail(hash);
   });
+
+  /* ---------------------- Accesibilidad: lectura en voz alta ---------------------- */
+  let speechState = "idle"; // idle | playing | paused
+
+  function buildSpeechText(c) {
+    const parts = [`Ficha de ${c.nombre}.`];
+    if (c.categoria) parts.push(`Categoría: ${c.categoria}.`);
+    if (c.queHace) parts.push(`¿Qué hace este profesional? ${c.queHace}`);
+    if (c.problemasQueResuelve) parts.push(`¿Qué problemas resuelve? ${c.problemasQueResuelve}`);
+    if (c.perfilRecomendado) parts.push(`Perfil recomendado: ${c.perfilRecomendado}`);
+    if (c.duracionAnios) parts.push(`Duración: ${c.duracionAnios} años.`);
+    if (c.habilidades && c.habilidades.length) parts.push(`Habilidades necesarias: ${c.habilidades.join(", ")}.`);
+    if (c.salidasLaborales && c.salidasLaborales.length) parts.push(`Salidas laborales: ${c.salidasLaborales.join(", ")}.`);
+    if (c.salario && (c.salario.junior || c.salario.semiSenior || c.salario.senior)) {
+      parts.push(`Sueldos de referencia en Argentina. Junior: ${c.salario.junior || "no disponible"}. Semi senior: ${c.salario.semiSenior || "no disponible"}. Senior: ${c.salario.senior || "no disponible"}.`);
+    }
+    if (c.ventajas && c.ventajas.length) parts.push(`Ventajas: ${c.ventajas.join(". ")}.`);
+    if (c.desafios && c.desafios.length) parts.push(`Desafíos a tener en cuenta: ${c.desafios.join(". ")}.`);
+    return parts.join(" ");
+  }
+
+  function updateSpeakButtonLabel() {
+    const label = document.getElementById("speakBtnLabel");
+    if (!label) return;
+    if (speechState === "playing") label.textContent = "Pausar lectura";
+    else if (speechState === "paused") label.textContent = "Continuar lectura";
+    else label.textContent = "Escuchar esta ficha";
+  }
+
+  function toggleSpeech(c) {
+    if (!("speechSynthesis" in window)) return;
+
+    if (speechState === "playing") {
+      window.speechSynthesis.pause();
+      speechState = "paused";
+      updateSpeakButtonLabel();
+      return;
+    }
+    if (speechState === "paused") {
+      window.speechSynthesis.resume();
+      speechState = "playing";
+      updateSpeakButtonLabel();
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(buildSpeechText(c));
+    utter.lang = "es-AR";
+    utter.rate = 0.98;
+    utter.onend = () => { speechState = "idle"; updateSpeakButtonLabel(); };
+    utter.onerror = () => { speechState = "idle"; updateSpeakButtonLabel(); };
+    window.speechSynthesis.speak(utter);
+    speechState = "playing";
+    updateSpeakButtonLabel();
+  }
+
+  function stopSpeech() {
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    speechState = "idle";
+  }
+
+  // Si el usuario cambia de pestaña o cierra el navegador, no dejar la voz sonando sola
+  window.addEventListener("pagehide", stopSpeech);
+
+  /* ---------------------- Accesibilidad: descargar ficha en PDF ---------------------- */
+  let jsPdfLoadPromise = null;
+
+  function loadJsPDF() {
+    if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+    if (jsPdfLoadPromise) return jsPdfLoadPromise;
+    jsPdfLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      script.onload = () => {
+        if (window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
+        else reject(new Error("No se pudo preparar el generador de PDF."));
+      };
+      script.onerror = () => reject(new Error("No se pudo descargar el generador de PDF. Revisá tu conexión."));
+      document.head.appendChild(script);
+    });
+    return jsPdfLoadPromise;
+  }
+
+  function downloadCareerPdf(c) {
+    const btnLabel = document.getElementById("downloadPdfBtnLabel");
+    const originalLabel = btnLabel ? btnLabel.textContent : null;
+    if (btnLabel) btnLabel.textContent = "Generando PDF…";
+
+    loadJsPDF().then((jsPDF) => {
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 48;
+      const maxWidth = pageWidth - marginX * 2;
+      let y = 56;
+
+      function ensureSpace(lineHeight) {
+        if (y + lineHeight > pageHeight - 48) { doc.addPage(); y = 56; }
+      }
+      function addTitle(text) {
+        doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+        doc.splitTextToSize(text, maxWidth).forEach((line) => { ensureSpace(24); doc.text(line, marginX, y); y += 24; });
+        y += 4;
+      }
+      function addHeading(text) {
+        ensureSpace(26); y += 10;
+        doc.setFont("helvetica", "bold"); doc.setFontSize(12.5); doc.setTextColor(160, 90, 30);
+        doc.text(text, marginX, y);
+        doc.setTextColor(20, 20, 20);
+        y += 16;
+      }
+      function addParagraph(text) {
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+        doc.splitTextToSize(text, maxWidth).forEach((line) => { ensureSpace(15); doc.text(line, marginX, y); y += 14.5; });
+        y += 4;
+      }
+      function addList(items) {
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+        items.forEach((item) => {
+          doc.splitTextToSize("•  " + item, maxWidth).forEach((line, i) => { ensureSpace(15); doc.text(line, marginX, y); y += 14.5; });
+        });
+        y += 4;
+      }
+
+      addTitle(c.nombre);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(110, 110, 110);
+      const subtitle = c.categoria + (institucionNombres(c.institucion).length ? " · " + institucionNombres(c.institucion).join(", ") : "");
+      doc.splitTextToSize(subtitle, maxWidth).forEach((line) => { doc.text(line, marginX, y); y += 13; });
+      doc.setTextColor(20, 20, 20);
+      y += 10;
+
+      addHeading("Datos generales");
+      addParagraph(`Duración: ${c.duracionInstituciones || (c.duracionAnios ? c.duracionAnios + " años" : "No disponible")}`);
+      addParagraph(`Carga horaria: ${c.cargaHoraria || "No disponible"}`);
+      addParagraph(`Dificultad: ${c.dificultad || "No disponible"}`);
+      addParagraph(`Modalidad: ${modalidadTexto(c)}`);
+
+      if (c.queHace) { addHeading("¿Qué hace este profesional?"); addParagraph(c.queHace); }
+      if (c.problemasQueResuelve) { addHeading("¿Qué problemas resuelve?"); addParagraph(c.problemasQueResuelve); }
+      if (c.perfilRecomendado) { addHeading("Perfil recomendado"); addParagraph(c.perfilRecomendado); }
+      if (c.habilidades && c.habilidades.length) { addHeading("Habilidades necesarias"); addList(c.habilidades); }
+      if (c.materiasPrincipales && c.materiasPrincipales.length) { addHeading("Materias principales"); addList(c.materiasPrincipales); }
+      if (c.salidasLaborales && c.salidasLaborales.length) { addHeading("Salidas laborales"); addList(c.salidasLaborales); }
+
+      const salaryHasData = c.salario && (c.salario.junior || c.salario.semiSenior || c.salario.senior);
+      if (salaryHasData) {
+        addHeading("Salarios de referencia en Argentina");
+        addParagraph(`Junior: ${c.salario.junior || "—"}   ·   Semi senior: ${c.salario.semiSenior || "—"}   ·   Senior: ${c.salario.senior || "—"}`);
+        addParagraph(`Moneda: ${c.salario.moneda || "ARS"}. Referencia: ${c.salario.fechaReferencia || "no especificada"}.`);
+        if (c.salario.fuentes && c.salario.fuentes.length) addParagraph(`Fuentes: ${c.salario.fuentes.join(" · ")}`);
+      }
+
+      if (c.ventajas && c.ventajas.length) { addHeading("Ventajas"); addList(c.ventajas); }
+      if (c.desafios && c.desafios.length) { addHeading("Desafíos"); addList(c.desafios); }
+      if (c.datosInteresantes && c.datosInteresantes.length) { addHeading("Datos interesantes"); addList(c.datosInteresantes); }
+
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        doc.setPage(p);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
+        doc.text(`Orientación Vocacional · ${c.nombre} · Página ${p} de ${totalPages}`, marginX, pageHeight - 24);
+      }
+
+      doc.save("ficha-" + c.id + ".pdf");
+      if (btnLabel) btnLabel.textContent = originalLabel;
+    }).catch((err) => {
+      showToast(err && err.message ? err.message : "No se pudo generar el PDF");
+      if (btnLabel) btnLabel.textContent = originalLabel;
+    });
+  }
 
   /* ---------------------- Comparador de carreras ---------------------- */
   const MAX_COMPARE = 3;
@@ -1023,6 +1219,30 @@
         showToast("No se pudo copiar el enlace");
       }
     }
+  });
+
+  /* ---------------------- Instalar como app ---------------------- */
+  const installAppBtn = document.getElementById("installAppBtn");
+  let deferredInstallPrompt = null;
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    installAppBtn.hidden = false;
+  });
+
+  installAppBtn.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+    installAppBtn.hidden = true;
+    deferredInstallPrompt.prompt();
+    try { await deferredInstallPrompt.userChoice; } catch (e) { /* usuario cerró el diálogo */ }
+    deferredInstallPrompt = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    installAppBtn.hidden = true;
+    deferredInstallPrompt = null;
+    showToast("¡Aplicación instalada! Ya la podés abrir desde tu pantalla de inicio 📲");
   });
 
   /* ---------------------- Volver arriba ---------------------- */

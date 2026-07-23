@@ -7,11 +7,19 @@
 
   const grid = document.getElementById("careersGrid");
   const searchInput = document.getElementById("searchInput");
+  const searchClearBtn = document.getElementById("searchClear");
+  const searchSuggestions = document.getElementById("searchSuggestions");
+  const searchHint = document.getElementById("searchHint");
   const chipsWrap = document.getElementById("categoryChips");
   const titleChipsWrap = document.getElementById("titleChips");
   const modalityChipsWrap = document.getElementById("modalityChips");
+  const durationChipsWrap = document.getElementById("durationChips");
   const institutionSelect = document.getElementById("institutionFilter");
+  const sortSelect = document.getElementById("sortSelect");
   const clearFiltersBtn = document.getElementById("clearFilters");
+  const filtersToggleBtn = document.getElementById("filtersToggle");
+  const filtersPanel = document.getElementById("filtersPanel");
+  const filtersActiveBadge = document.getElementById("filtersActiveBadge");
   const resultsCount = document.getElementById("resultsCount");
   const noResults = document.getElementById("noResults");
   const totalCarrerasEl = document.getElementById("totalCarreras");
@@ -19,7 +27,9 @@
   let activeCategory = "Todas";
   let activeTitleType = "Todos";
   let activeModality = "Todas";
+  let activeDuration = "Todas";
   let activeInstitution = "todas";
+  let activeSort = "relevancia";
   let query = "";
 
   totalCarrerasEl.textContent = CAREERS.length;
@@ -122,6 +132,32 @@
     modalityChipsWrap.appendChild(btn);
   });
 
+  /* ---------------------- Chips de duración ---------------------- */
+  // Clasifica la duración en baldes simples y legibles para un estudiante
+  // de secundario que recién está comparando opciones.
+  function duracionCategoria(anios) {
+    if (anios === null || anios === undefined) return "Variable / posgrado";
+    if (anios <= 2) return "Corta (hasta 2 años)";
+    if (anios <= 4) return "Media (3 a 4 años)";
+    return "Larga (5 años o más)";
+  }
+  const duraciones = ["Todas", "Corta (hasta 2 años)", "Media (3 a 4 años)", "Larga (5 años o más)", "Variable / posgrado"];
+
+  duraciones.forEach(dur => {
+    const btn = document.createElement("button");
+    btn.className = "chip" + (dur === "Todas" ? " active" : "");
+    btn.textContent = dur;
+    btn.setAttribute("role", "tab");
+    btn.addEventListener("click", () => {
+      activeDuration = dur;
+      durationChipsWrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      renderGrid();
+      updateClearButton();
+    });
+    durationChipsWrap.appendChild(btn);
+  });
+
   /* ---------------------- Selector de institución/facultad ---------------------- */
   const institucionesOrdenadas = Object.entries(INSTITUCIONES).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, "es"));
   const optTodas = document.createElement("option");
@@ -140,37 +176,262 @@
     updateClearButton();
   });
 
+  /* ---------------------- Ordenar por ---------------------- */
+  sortSelect.addEventListener("change", (e) => {
+    activeSort = e.target.value;
+    renderGrid();
+    updateClearButton();
+  });
+
   /* ---------------------- Limpiar filtros ---------------------- */
   function updateClearButton() {
-    const hayFiltros = activeCategory !== "Todas" || activeTitleType !== "Todos" || activeModality !== "Todas" || activeInstitution !== "todas" || query !== "";
+    const hayFiltros = activeCategory !== "Todas" || activeTitleType !== "Todos" || activeModality !== "Todas"
+      || activeDuration !== "Todas" || activeInstitution !== "todas" || activeSort !== "relevancia" || query !== "";
     clearFiltersBtn.hidden = !hayFiltros;
+
+    // El badge solo cuenta los filtros que viven DENTRO del panel plegable
+    // (tipo de título, modalidad, duración, institución, orden), no la
+    // categoría ni la búsqueda, que quedan siempre visibles afuera.
+    const activosEnPanel = [
+      activeTitleType !== "Todos",
+      activeModality !== "Todas",
+      activeDuration !== "Todas",
+      activeInstitution !== "todas",
+      activeSort !== "relevancia"
+    ].filter(Boolean).length;
+    filtersActiveBadge.textContent = activosEnPanel;
+    filtersActiveBadge.hidden = activosEnPanel === 0;
   }
+
+  /* ---------------------- Plegar / desplegar filtros avanzados ---------------------- */
+  // Colapsado por defecto: se abre para tocar los filtros, se cierra para
+  // no molestar al buscador, y todo sigue filtrando igual estando oculto
+  // porque el estado vive en las variables de JS, no en la visibilidad del DOM.
+  filtersToggleBtn.addEventListener("click", () => {
+    const abierto = filtersToggleBtn.getAttribute("aria-expanded") === "true";
+    filtersToggleBtn.setAttribute("aria-expanded", String(!abierto));
+    filtersPanel.hidden = abierto;
+  });
 
   clearFiltersBtn.addEventListener("click", () => {
     activeCategory = "Todas";
     activeTitleType = "Todos";
     activeModality = "Todas";
+    activeDuration = "Todas";
     activeInstitution = "todas";
+    activeSort = "relevancia";
     query = "";
     searchInput.value = "";
+    hideSuggestions();
+    searchClearBtn.hidden = true;
+    searchHint.hidden = true;
     chipsWrap.querySelectorAll(".chip").forEach((c, i) => c.classList.toggle("active", i === 0));
     titleChipsWrap.querySelectorAll(".chip").forEach((c, i) => c.classList.toggle("active", i === 0));
     modalityChipsWrap.querySelectorAll(".chip").forEach((c, i) => c.classList.toggle("active", i === 0));
+    durationChipsWrap.querySelectorAll(".chip").forEach((c, i) => c.classList.toggle("active", i === 0));
     institutionSelect.value = "todas";
+    sortSelect.value = "relevancia";
     renderGrid();
     updateClearButton();
   });
 
   /* ---------------------- Buscador ---------------------- */
+  // Sin esto, buscar "ingenieria" (como escribe la mayoría en el celular)
+  // no encontraría "Ingeniería" por la tilde. Se normaliza todo (haystack
+  // y consulta) sacando los diacríticos antes de comparar.
+  function normalizeAccents(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  // El haystack ahora incluye mucho más que nombre/descripción/categoría:
+  // salidas laborales, habilidades, materias, empresas, datos interesantes
+  // e institución. Así "programación" encuentra Ingeniería en Sistemas,
+  // "sueldo alto" no sirve como texto libre pero "docente" sí encuentra
+  // carreras cuya salida laboral es dar clases, aunque no lo diga el nombre.
+  function buildHaystack(c) {
+    const partes = [
+      c.nombre, c.descripcionBreve, c.categoria, c.queHace,
+      c.salidasLaborales, c.habilidades, c.materiasPrincipales,
+      c.empresasArgentinas, c.organismosPublicos, c.datosInteresantes,
+      c.especializaciones, institucionNombres(c.institucion)
+    ];
+    return partes
+      .flat()
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+  }
+  function normalizedHaystack(c) {
+    return normalizeAccents(buildHaystack(c));
+  }
+  // Precalculado una sola vez: recorrer 139 carreras en cada tecleo es barato,
+  // pero armar el string es lo único que vale la pena cachear.
+  const haystackCache = new Map();
+  function haystackOf(c) {
+    if (!haystackCache.has(c.id)) haystackCache.set(c.id, normalizedHaystack(c));
+    return haystackCache.get(c.id);
+  }
+
+  // Búsqueda por palabras: "ingeniero sueldo alto" exige que las tres
+  // palabras aparezcan en algún lugar de la ficha, no como frase exacta.
+  function matchesQuery(c, q) {
+    if (!q) return true;
+    const haystack = haystackOf(c);
+    const words = normalizeAccents(q).split(/\s+/).filter(Boolean);
+    return words.every(w => haystack.includes(w));
+  }
+  // Para el hint: ¿el match vino del nombre, o solo de campos ampliados?
+  function matchesNameOnly(c, q) {
+    if (!q) return true;
+    const nombreLower = normalizeAccents(c.nombre.toLowerCase());
+    const words = normalizeAccents(q).split(/\s+/).filter(Boolean);
+    return words.every(w => nombreLower.includes(w));
+  }
+
+  function hideSuggestions() {
+    searchSuggestions.hidden = true;
+    searchSuggestions.innerHTML = "";
+    searchInput.setAttribute("aria-expanded", "false");
+  }
+
+  const ACCENT_MAP = { a: "[aá]", e: "[eé]", i: "[ií]", o: "[oó]", u: "[uúü]", n: "[nñ]" };
+  function accentInsensitivePattern(word) {
+    return word.split("").map(ch => {
+      const lower = ch.toLowerCase();
+      if (ACCENT_MAP[lower]) return ACCENT_MAP[lower];
+      return ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }).join("");
+  }
+
+  function highlightMatch(text, q) {
+    if (!q) return text;
+    const words = normalizeAccents(q).split(/\s+/).filter(Boolean).sort((a, b) => b.length - a.length);
+    let out = text;
+    words.forEach(w => {
+      out = out.replace(new RegExp("(" + accentInsensitivePattern(w) + ")", "ig"), "<mark>$1</mark>");
+    });
+    return out;
+  }
+
+  let suggestionIndex = -1;
+
+  function renderSuggestions(q) {
+    if (!q) { hideSuggestions(); return; }
+    const matches = CAREERS.filter(c => matchesQuery(c, q)).slice(0, 7);
+    if (matches.length === 0) { hideSuggestions(); return; }
+
+    searchSuggestions.innerHTML = matches.map((c, i) => `
+      <button type="button" class="search-suggestion-item" data-id="${c.id}" role="option" id="suggestion-${i}">
+        <span class="search-suggestion-icon" aria-hidden="true">${c.icono}</span>
+        <span class="search-suggestion-text">${highlightMatch(c.nombre, q)}</span>
+        <span class="search-suggestion-category">${c.categoria}</span>
+      </button>
+    `).join("");
+    searchSuggestions.hidden = false;
+    searchInput.setAttribute("aria-expanded", "true");
+    suggestionIndex = -1;
+
+    searchSuggestions.querySelectorAll(".search-suggestion-item").forEach(item => {
+      item.addEventListener("click", () => {
+        hideSuggestions();
+        openDetail(item.dataset.id);
+      });
+    });
+  }
+
+  function updateSuggestionHighlight() {
+    const items = searchSuggestions.querySelectorAll(".search-suggestion-item");
+    items.forEach((item, i) => item.classList.toggle("active-suggestion", i === suggestionIndex));
+    if (suggestionIndex >= 0 && items[suggestionIndex]) {
+      items[suggestionIndex].scrollIntoView({ block: "nearest" });
+    }
+  }
+
   let debounceTimer;
   searchInput.addEventListener("input", (e) => {
+    const raw = e.target.value;
+    searchClearBtn.hidden = raw.trim() === "";
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      query = e.target.value.trim().toLowerCase();
+      query = raw.trim().toLowerCase();
       renderGrid();
       updateClearButton();
+      renderSuggestions(query);
+
+      // Si hay resultados pero ninguno matchea por el nombre, avisamos que
+      // el match viene de salidas laborales / materias / habilidades, para
+      // que no parezca un resultado "raro".
+      const list = filteredCareers();
+      if (query && list.length > 0 && !list.some(c => matchesNameOnly(c, query))) {
+        searchHint.hidden = false;
+        searchHint.textContent = `No hay carreras que se llamen "${query}", pero encontramos coincidencias en salidas laborales, materias o habilidades.`;
+      } else {
+        searchHint.hidden = true;
+      }
     }, 140);
   });
+
+  searchInput.addEventListener("keydown", (e) => {
+    const items = searchSuggestions.querySelectorAll(".search-suggestion-item");
+    if (searchSuggestions.hidden || items.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      suggestionIndex = Math.min(suggestionIndex + 1, items.length - 1);
+      updateSuggestionHighlight();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      suggestionIndex = Math.max(suggestionIndex - 1, -1);
+      updateSuggestionHighlight();
+    } else if (e.key === "Enter" && suggestionIndex >= 0) {
+      e.preventDefault();
+      hideSuggestions();
+      openDetail(items[suggestionIndex].dataset.id);
+    } else if (e.key === "Escape") {
+      hideSuggestions();
+    }
+  });
+
+  searchInput.addEventListener("focus", () => { if (query) renderSuggestions(query); });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".search-wrap")) hideSuggestions();
+  });
+
+  searchClearBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    query = "";
+    searchClearBtn.hidden = true;
+    searchHint.hidden = true;
+    hideSuggestions();
+    searchInput.focus();
+    renderGrid();
+    updateClearButton();
+  });
+
+  /* ---------------------- Orden ---------------------- */
+  // Extrae el primer número del rango de sueldo junior ("700.000 – 1.400.000"
+  // → 700000). Las fichas de posgrado/diplomatura tienen "N/A" y quedan al
+  // final cuando se ordena por sueldo.
+  function sueldoJuniorNumero(c) {
+    const j = c.salario && c.salario.junior;
+    if (!j) return -1;
+    const digits = j.replace(/\./g, "").match(/\d+/);
+    return digits ? parseInt(digits[0], 10) : -1;
+  }
+  function ordenarCareers(list) {
+    const arr = list.slice();
+    switch (activeSort) {
+      case "az":
+        return arr.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+      case "duracion-asc":
+        return arr.sort((a, b) => (a.duracionAnios ?? 99) - (b.duracionAnios ?? 99));
+      case "duracion-desc":
+        return arr.sort((a, b) => (b.duracionAnios ?? -1) - (a.duracionAnios ?? -1));
+      case "sueldo-desc":
+        return arr.sort((a, b) => sueldoJuniorNumero(b) - sueldoJuniorNumero(a));
+      default:
+        return arr; // "relevancia": orden alfabético que ya trae CAREERS
+    }
+  }
 
   /* ---------------------- Render de la grilla ---------------------- */
   function filteredCareers() {
@@ -180,15 +441,14 @@
       const matchesModality = activeModality === "Todas"
         || (activeModality === "Presencial" && esPresencial(c))
         || (activeModality === "Virtual" && esVirtual(c));
+      const matchesDuration = activeDuration === "Todas" || duracionCategoria(c.duracionAnios) === activeDuration;
       const matchesInstitution = activeInstitution === "todas" || institucionIds(c).includes(activeInstitution);
-      const haystack = (c.nombre + " " + c.descripcionBreve + " " + c.categoria).toLowerCase();
-      const matchesQuery = query === "" || haystack.includes(query);
-      return matchesCategory && matchesTitleType && matchesModality && matchesInstitution && matchesQuery;
+      return matchesCategory && matchesTitleType && matchesModality && matchesDuration && matchesInstitution && matchesQuery(c, query);
     });
   }
 
   function renderGrid() {
-    const list = filteredCareers();
+    const list = ordenarCareers(filteredCareers());
     grid.innerHTML = "";
     resultsCount.textContent = list.length + (list.length === 1 ? " carrera" : " carreras");
     noResults.hidden = list.length !== 0;

@@ -62,13 +62,22 @@
 
       <div class="search-wrap">
         <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="searchInput" type="text" placeholder="Buscá una carrera... ej: sistemas, medicina, abogacía" autocomplete="off">
+        <input id="searchInput" type="text" placeholder="Buscá por nombre, salida laboral, materia, habilidad..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="searchSuggestions" aria-autocomplete="list">
+        <button id="searchClear" class="search-clear-btn" type="button" hidden aria-label="Borrar búsqueda">✕</button>
+        <div id="searchSuggestions" class="search-suggestions" role="listbox" hidden></div>
       </div>
+      <p id="searchHint" class="search-hint" hidden></p>
 
       <div id="categoryChips" class="category-chips" role="tablist" aria-label="Filtrar por área"></div>
 
       <!-- ============ FILTROS AVANZADOS ============ -->
-      <div class="filters-panel">
+      <button id="filtersToggle" class="filters-toggle-btn" type="button" aria-expanded="false" aria-controls="filtersPanel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        <span>Filtros avanzados</span>
+        <span id="filtersActiveBadge" class="filters-active-badge" hidden>0</span>
+        <svg class="filters-toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="filtersPanel" class="filters-panel" hidden>
         <div class="filter-group">
           <span class="filter-label">Tipo de título</span>
           <div id="titleChips" class="category-chips" role="tablist" aria-label="Filtrar por tipo de título"></div>
@@ -78,8 +87,22 @@
           <div id="modalityChips" class="category-chips" role="tablist" aria-label="Filtrar por modalidad"></div>
         </div>
         <div class="filter-group">
+          <span class="filter-label">Duración</span>
+          <div id="durationChips" class="category-chips" role="tablist" aria-label="Filtrar por duración"></div>
+        </div>
+        <div class="filter-group">
           <label class="filter-label" for="institutionFilter">Facultad / Institución</label>
           <select id="institutionFilter" class="institution-select" aria-label="Filtrar por institución"></select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="sortSelect">Ordenar por</label>
+          <select id="sortSelect" class="institution-select" aria-label="Ordenar resultados">
+            <option value="relevancia">Relevancia</option>
+            <option value="az">Nombre (A-Z)</option>
+            <option value="duracion-asc">Duración: más corta primero</option>
+            <option value="duracion-desc">Duración: más larga primero</option>
+            <option value="sueldo-desc">Sueldo inicial: mayor a menor</option>
+          </select>
         </div>
         <button id="clearFilters" class="clear-filters-btn" type="button" hidden>✕ Limpiar filtros</button>
       </div>
@@ -176,7 +199,7 @@
   <p class="footer-copy">Proyecto educativo sin fines de lucro. Hecho con HTML, CSS y JavaScript puro.</p>
 
   <div class="credits-box">
-    <p class="credits-version">Versión 7.4</p>
+    <p class="credits-version">Versión 7.5</p>
     <p class="credits-text">Desarrollado por <strong>Monzón Dilan Agustín</strong>, con la asistencia de Claude (Anthropic).</p>
     <p class="credits-text">Este proyecto va a seguir recibiendo actualizaciones: más carreras, facultades y planes de estudio, y nuevas funciones para que sea cada vez más útil.</p>
   </div>

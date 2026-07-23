@@ -202,6 +202,7 @@ button { font-family: var(--font-body); cursor: pointer; }
 
 .search-wrap {
   position: relative;
+  z-index: 25;
   max-width: 560px;
   animation: fadeUp .7s ease .16s both;
 }
@@ -212,7 +213,7 @@ button { font-family: var(--font-body); cursor: pointer; }
 }
 #searchInput {
   width: 100%;
-  padding: 16px 20px 16px 50px;
+  padding: 16px 46px 16px 50px;
   border-radius: 999px;
   border: 1.5px solid var(--card-border);
   background: var(--card);
@@ -224,6 +225,65 @@ button { font-family: var(--font-body); cursor: pointer; }
 }
 #searchInput:focus { border-color: var(--accent); outline: none; }
 #searchInput::placeholder { color: var(--text-faint); }
+
+.search-clear-btn {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: var(--card-border);
+  color: var(--text-muted);
+  font-size: .75rem;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.search-clear-btn:hover { background: var(--accent); color: var(--accent-contrast); }
+.search-clear-btn[hidden] { display: none; }
+
+.search-hint {
+  margin-top: 8px;
+  font-size: .8rem;
+  color: var(--text-faint);
+  animation: fadeUp .4s ease both;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0; right: 0;
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  z-index: 20;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.search-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: .88rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border-bottom: 1px solid var(--card-border);
+  transition: background .12s ease;
+}
+.search-suggestion-item:last-child { border-bottom: none; }
+.search-suggestion-item:hover,
+.search-suggestion-item.active-suggestion { background: var(--accent-soft); }
+.search-suggestion-icon { flex-shrink: 0; font-size: 1.1rem; }
+.search-suggestion-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-suggestion-text mark { background: var(--accent); color: var(--accent-contrast); border-radius: 3px; padding: 0 1px; }
+.search-suggestion-category { flex-shrink: 0; font-size: .72rem; color: var(--text-faint); font-family: var(--font-mono); }
 
 .category-chips {
   display: flex;
@@ -249,6 +309,42 @@ button { font-family: var(--font-body); cursor: pointer; }
 /* ---------------------------------------------------------------------
    PANEL DE FILTROS AVANZADOS (tipo de título, modalidad, institución)
    --------------------------------------------------------------------- */
+.filters-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--text-muted);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: .84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, transform .15s ease;
+  animation: fadeUp .7s ease .24s both;
+}
+.filters-toggle-btn:hover { border-color: var(--accent); color: var(--text); }
+.filters-toggle-btn[aria-expanded="true"] { border-color: var(--accent); color: var(--text); }
+.filters-toggle-chevron { transition: transform .2s ease; flex-shrink: 0; }
+.filters-toggle-btn[aria-expanded="true"] .filters-toggle-chevron { transform: rotate(180deg); }
+.filters-active-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: .7rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.filters-active-badge[hidden] { display: none; }
+
 .filters-panel {
   margin-top: 20px;
   padding-top: 18px;
@@ -257,8 +353,9 @@ button { font-family: var(--font-body); cursor: pointer; }
   flex-wrap: wrap;
   gap: 20px 28px;
   align-items: flex-start;
-  animation: fadeUp .7s ease .26s both;
+  animation: fadeUp .4s ease both;
 }
+.filters-panel[hidden] { display: none; }
 .filter-group { display: flex; flex-direction: column; gap: 8px; }
 .filter-label {
   font-family: var(--font-mono);

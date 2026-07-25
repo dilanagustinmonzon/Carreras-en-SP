@@ -146,6 +146,7 @@ button { font-family: var(--font-body); cursor: pointer; }
   padding: 0 14px;
   gap: 7px;
 }
+.install-app-btn[hidden] { display: none !important; }
 .install-app-label { font-size: .82rem; font-weight: 600; white-space: nowrap; }
 @media (max-width: 480px) {
   .install-app-label { display: none; }
@@ -1052,6 +1053,35 @@ body.has-compare-bar .back-to-top { bottom: 96px; }
   cursor: pointer;
 }
 .compare-empty-back-btn:hover { transform: translateY(-2px); }
+
+/* Carreras relacionadas (dentro de la ficha de detalle) */
+.related-careers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+.related-career-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius-m);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+  font-family: var(--font-body);
+}
+.related-career-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.related-icon { font-size: 1.6rem; flex-shrink: 0; }
+.related-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.related-info strong { font-size: .92rem; color: var(--text); line-height: 1.3; }
+.related-meta { font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint); }
+.related-arrow { flex-shrink: 0; color: var(--text-faint); }
+.related-career-card:hover .related-arrow { color: var(--accent); }
 
 /* ---------------------------------------------------------------------
    RESPONSIVE

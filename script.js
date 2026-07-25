@@ -579,6 +579,25 @@
 
     const salaryHasData = c.salario && (c.salario.junior || c.salario.semiSenior || c.salario.senior);
 
+    const related = relatedCareers(c, 3);
+    const relatedHTML = related.length ? `
+      <div class="detail-section">
+        <h3>🔎 Carreras relacionadas</h3>
+        <div class="related-careers-grid">
+          ${related.map(rc => `
+            <button type="button" class="related-career-card" data-id="${rc.id}">
+              <span class="related-icon" aria-hidden="true">${rc.icono}</span>
+              <span class="related-info">
+                <strong>${rc.nombre}</strong>
+                <span class="related-meta">${rc.categoria}</span>
+              </span>
+              <svg class="related-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          `).join("")}
+        </div>
+      </div>
+    ` : "";
+
     detailContent.innerHTML = `
       <div class="detail-header">
         <span class="detail-icon" aria-hidden="true">${c.icono}</span>
@@ -717,6 +736,8 @@
         <div class="experience-box">${c.experienciaPersonal && c.experienciaPersonal.trim() !== "" ? c.experienciaPersonal : "Espacio libre para que agregues tu propia experiencia con esta carrera (editá el campo experienciaPersonal en careers-data.js)."}</div>
       </div>
 
+      ${relatedHTML}
+
       <div class="detail-section">
         <h3>📥 Material descargable</h3>
         <div class="downloads-grid">
@@ -740,6 +761,9 @@
     if (downloadPdfBtn) {
       downloadPdfBtn.addEventListener("click", () => downloadCareerPdf(c));
     }
+    detailContent.querySelectorAll(".related-career-card").forEach((btn) => {
+      btn.addEventListener("click", () => openDetail(btn.dataset.id));
+    });
 
     overlay.classList.add("open");
     overlay.setAttribute("aria-hidden", "false");
@@ -1042,6 +1066,24 @@
     return "No disponible";
   }
 
+  /* ---------------------- Carreras relacionadas ---------------------- */
+  function relatedCareers(c, limit) {
+    limit = limit || 3;
+    const myInst = institucionIds(c);
+    return CAREERS
+      .filter(o => o.id !== c.id)
+      .map(o => {
+        let score = 0;
+        if (o.categoria === c.categoria) score += 2;
+        if (institucionIds(o).some(id => myInst.includes(id))) score += 1;
+        return { o, score };
+      })
+      .filter(x => x.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map(x => x.o);
+  }
+
   const COMPARE_ROWS = [
     { label: "Institución", get: c => institucionNombres(c.institucion).join(" · ") || "No disponible" },
     { label: "Modalidad", get: modalidadTexto },
@@ -1225,6 +1267,22 @@
   const installAppBtn = document.getElementById("installAppBtn");
   let deferredInstallPrompt = null;
 
+  function isStandaloneApp() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+  function isIOSDevice() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  // Si ya está instalada y abierta como app, no tiene sentido mostrar el botón.
+  if (isStandaloneApp()) {
+    installAppBtn.hidden = true;
+  } else if (isIOSDevice()) {
+    // Safari/iOS nunca dispara "beforeinstallprompt": mostramos el botón
+    // igual y damos instrucciones manuales al tocarlo.
+    installAppBtn.hidden = false;
+  }
+
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
@@ -1232,11 +1290,18 @@
   });
 
   installAppBtn.addEventListener("click", async () => {
-    if (!deferredInstallPrompt) return;
-    installAppBtn.hidden = true;
-    deferredInstallPrompt.prompt();
-    try { await deferredInstallPrompt.userChoice; } catch (e) { /* usuario cerró el diálogo */ }
-    deferredInstallPrompt = null;
+    if (deferredInstallPrompt) {
+      installAppBtn.hidden = true;
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch (e) { /* usuario cerró el diálogo */ }
+      deferredInstallPrompt = null;
+      return;
+    }
+    if (isIOSDevice()) {
+      showToast("Para instalarla: tocá el ícono Compartir de Safari (⬆️) y elegí 'Agregar a pantalla de inicio' 📲");
+      return;
+    }
+    showToast("Este navegador todavía no ofreció instalar la app. Probá desde Chrome o Edge, esperá unos segundos navegando el sitio y volvé a intentar.");
   });
 
   window.addEventListener("appinstalled", () => {

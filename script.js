@@ -31,6 +31,7 @@
   let activeInstitution = "todas";
   let activeSort = "relevancia";
   let query = "";
+  let showOnlyFavorites = false;
 
   totalCarrerasEl.textContent = CAREERS.length;
 
@@ -443,7 +444,8 @@
         || (activeModality === "Virtual" && esVirtual(c));
       const matchesDuration = activeDuration === "Todas" || duracionCategoria(c.duracionAnios) === activeDuration;
       const matchesInstitution = activeInstitution === "todas" || institucionIds(c).includes(activeInstitution);
-      return matchesCategory && matchesTitleType && matchesModality && matchesDuration && matchesInstitution && matchesQuery(c, query);
+      const matchesFavorite = !showOnlyFavorites || isFavorite(c.id);
+      return matchesCategory && matchesTitleType && matchesModality && matchesDuration && matchesInstitution && matchesFavorite && matchesQuery(c, query);
     });
   }
 
@@ -462,8 +464,12 @@
       card.setAttribute("aria-label", "Ver información de " + career.nombre);
 
       const inCompare = isInCompare(career.id);
+      const isFav = isFavorite(career.id);
 
       card.innerHTML = `
+        <button type="button" class="card-fav-btn${isFav ? " active" : ""}" data-id="${career.id}" aria-pressed="${isFav ? "true" : "false"}" aria-label="${isFav ? "Quitar de favoritos" : "Agregar a favoritos"}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="${isFav ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        </button>
         <div class="card-top">
           <span class="card-icon" aria-hidden="true">${career.icono}</span>
           <span class="card-category">${career.categoria}</span>
@@ -495,6 +501,13 @@
         toggleCompare(career.id);
       });
       compareBtn.addEventListener("keypress", (e) => e.stopPropagation());
+
+      const favBtn = card.querySelector(".card-fav-btn");
+      favBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleFavorite(career.id);
+      });
+      favBtn.addEventListener("keypress", (e) => e.stopPropagation());
 
       grid.appendChild(card);
     });
@@ -731,11 +744,6 @@
         ${renderList(c.datosInteresantes)}
       </div>
 
-      <div class="detail-section">
-        <h3>📝 Mi experiencia personal</h3>
-        <div class="experience-box">${c.experienciaPersonal && c.experienciaPersonal.trim() !== "" ? c.experienciaPersonal : "Espacio libre para que agregues tu propia experiencia con esta carrera (editá el campo experienciaPersonal en careers-data.js)."}</div>
-      </div>
-
       ${relatedHTML}
 
       <div class="detail-section">
@@ -959,6 +967,73 @@
       if (btnLabel) btnLabel.textContent = originalLabel;
     });
   }
+
+  /* ---------------------- Favoritos ---------------------- */
+  // Se guardan en este navegador/dispositivo (localStorage), así que cada
+  // persona ve únicamente los suyos y nadie más los ve desde otro equipo.
+  const FAVORITES_KEY = "ov-favorites";
+  const favoritesToggleBtn = document.getElementById("favoritesToggle");
+  const favoritesCountEl = document.getElementById("favoritesCount");
+
+  let favoritesList = [];
+  try {
+    const savedFav = JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
+    if (Array.isArray(savedFav)) favoritesList = savedFav.filter(id => CAREERS.some(c => c.id === id));
+  } catch (e) { /* modo privado: se ignora */ }
+
+  function isFavorite(id) { return favoritesList.includes(id); }
+
+  function saveFavoritesList() {
+    try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favoritesList)); } catch (e) { /* modo privado */ }
+  }
+
+  function syncFavoriteButtons() {
+    document.querySelectorAll(".card-fav-btn").forEach((btn) => {
+      const active = isFavorite(btn.dataset.id);
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+      btn.setAttribute("aria-label", active ? "Quitar de favoritos" : "Agregar a favoritos");
+      const svg = btn.querySelector("svg");
+      if (svg) svg.setAttribute("fill", active ? "currentColor" : "none");
+    });
+  }
+
+  function updateFavoritesToggleUI() {
+    favoritesCountEl.textContent = favoritesList.length;
+    favoritesCountEl.hidden = favoritesList.length === 0;
+    favoritesToggleBtn.classList.toggle("active", showOnlyFavorites);
+    favoritesToggleBtn.setAttribute("aria-pressed", showOnlyFavorites ? "true" : "false");
+  }
+
+  function toggleFavorite(id) {
+    const idx = favoritesList.indexOf(id);
+    if (idx > -1) favoritesList.splice(idx, 1);
+    else favoritesList.push(id);
+    saveFavoritesList();
+    syncFavoriteButtons();
+    updateFavoritesToggleUI();
+
+    // Si estábamos viendo "solo favoritos" y se vació la lista, volvemos a mostrar todas
+    if (showOnlyFavorites && favoritesList.length === 0) {
+      showOnlyFavorites = false;
+      updateFavoritesToggleUI();
+      showToast("Ya no tenés carreras marcadas como favoritas");
+    }
+    if (showOnlyFavorites) renderGrid();
+  }
+
+  favoritesToggleBtn.addEventListener("click", () => {
+    if (!showOnlyFavorites && favoritesList.length === 0) {
+      showToast("Todavía no marcaste ninguna carrera como favorita. Tocá el ❤️ en las tarjetas que te interesen.");
+      return;
+    }
+    showOnlyFavorites = !showOnlyFavorites;
+    updateFavoritesToggleUI();
+    renderGrid();
+    if (showOnlyFavorites) document.getElementById("carreras").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  updateFavoritesToggleUI();
 
   /* ---------------------- Comparador de carreras ---------------------- */
   const MAX_COMPARE = 3;
@@ -1261,53 +1336,6 @@
         showToast("No se pudo copiar el enlace");
       }
     }
-  });
-
-  /* ---------------------- Instalar como app ---------------------- */
-  const installAppBtn = document.getElementById("installAppBtn");
-  let deferredInstallPrompt = null;
-
-  function isStandaloneApp() {
-    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  }
-  function isIOSDevice() {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-  }
-
-  // Si ya está instalada y abierta como app, no tiene sentido mostrar el botón.
-  if (isStandaloneApp()) {
-    installAppBtn.hidden = true;
-  } else if (isIOSDevice()) {
-    // Safari/iOS nunca dispara "beforeinstallprompt": mostramos el botón
-    // igual y damos instrucciones manuales al tocarlo.
-    installAppBtn.hidden = false;
-  }
-
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredInstallPrompt = e;
-    installAppBtn.hidden = false;
-  });
-
-  installAppBtn.addEventListener("click", async () => {
-    if (deferredInstallPrompt) {
-      installAppBtn.hidden = true;
-      deferredInstallPrompt.prompt();
-      try { await deferredInstallPrompt.userChoice; } catch (e) { /* usuario cerró el diálogo */ }
-      deferredInstallPrompt = null;
-      return;
-    }
-    if (isIOSDevice()) {
-      showToast("Para instalarla: tocá el ícono Compartir de Safari (⬆️) y elegí 'Agregar a pantalla de inicio' 📲");
-      return;
-    }
-    showToast("Este navegador todavía no ofreció instalar la app. Probá desde Chrome o Edge, esperá unos segundos navegando el sitio y volvé a intentar.");
-  });
-
-  window.addEventListener("appinstalled", () => {
-    installAppBtn.hidden = true;
-    deferredInstallPrompt = null;
-    showToast("¡Aplicación instalada! Ya la podés abrir desde tu pantalla de inicio 📲");
   });
 
   /* ---------------------- Volver arriba ---------------------- */

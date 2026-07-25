@@ -309,11 +309,17 @@ button { font-family: var(--font-body); cursor: pointer; }
 /* ---------------------------------------------------------------------
    PANEL DE FILTROS AVANZADOS (tipo de título, modalidad, institución)
    --------------------------------------------------------------------- */
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
 .filters-toggle-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 20px;
   padding: 10px 16px;
   border: 1.5px solid var(--card-border);
   background: var(--card);
@@ -330,6 +336,24 @@ button { font-family: var(--font-body); cursor: pointer; }
 .filters-toggle-btn[aria-expanded="true"] { border-color: var(--accent); color: var(--text); }
 .filters-toggle-chevron { transition: transform .2s ease; flex-shrink: 0; }
 .filters-toggle-btn[aria-expanded="true"] .filters-toggle-chevron { transform: rotate(180deg); }
+
+.surprise-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: none;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: .84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s ease;
+  animation: fadeUp .7s ease .28s both;
+}
+.surprise-btn:hover { transform: translateY(-2px) rotate(-2deg); }
 .filters-active-badge {
   display: inline-flex;
   align-items: center;
@@ -563,6 +587,43 @@ button { font-family: var(--font-body); cursor: pointer; }
 .no-results { text-align: center; color: var(--text-muted); padding: 40px 0; }
 
 /* ---------------------------------------------------------------------
+   GUÍA: CÓMO ELEGIR CARRERA
+   --------------------------------------------------------------------- */
+.guide-section { padding: 20px 0 56px; }
+.guide-intro { color: var(--text-muted); max-width: 640px; margin: 10px 0 30px; }
+.guide-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.guide-step-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-m);
+  padding: 24px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.guide-step-number {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.guide-step-icon { font-size: 1.7rem; }
+.guide-step-card h3 { font-size: 1rem; line-height: 1.35; margin: 2px 0 0; }
+.guide-step-card p { color: var(--text-muted); font-size: .87rem; line-height: 1.55; margin: 0; }
+
+@media (max-width: 860px) {
+  .guide-steps-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------
    UNIVERSIDAD / INSTITUCIONES
    --------------------------------------------------------------------- */
 .university-section { padding: 60px 0; background: var(--bg-elevated); border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); }
@@ -594,6 +655,11 @@ button { font-family: var(--font-body); cursor: pointer; }
 .institucion-direccion { font-size: .82rem; color: var(--text-faint); }
 .institucion-web { font-size: .85rem; color: var(--link); text-decoration: none; font-weight: 500; }
 .institucion-web:hover { text-decoration: underline; }
+
+.instituciones-compare-title { font-size: 1.08rem; margin: 30px 0 14px; }
+.instituciones-compare-wrap { margin-bottom: 32px; }
+.instituciones-table th:first-child, .instituciones-table td:first-child { font-weight: 600; color: var(--text); min-width: 190px; max-width: 220px; white-space: normal; }
+.instituciones-table td { color: var(--text-muted); }
 
 /* Badge de institución dentro de tarjetas y ficha de detalle */
 .badge-institucion {
@@ -1136,6 +1202,11 @@ body.has-compare-bar .back-to-top { bottom: 96px; }
   .hero-title { font-size: clamp(1.6rem, 7vw, 2.2rem); }
   .hero-sub { font-size: .96rem; }
   #searchInput { padding: 14px 18px 14px 46px; font-size: .95rem; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .filters-toggle-btn, .surprise-btn { justify-content: center; width: 100%; }
+
+  .guide-section { padding: 8px 0 40px; }
+  .guide-steps-grid { grid-template-columns: 1fr; }
 
   .careers-section { padding: 8px 0 48px; }
   .careers-grid { grid-template-columns: 1fr; gap: 14px; }

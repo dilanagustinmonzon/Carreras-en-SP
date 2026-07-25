@@ -79,6 +79,37 @@
     });
   }
 
+  /* ---------------------- Comparador de instituciones ---------------------- */
+  const institucionesCompareBody = document.getElementById("institucionesCompareBody");
+  if (institucionesCompareBody && typeof INSTITUCIONES === "object") {
+    const filasOrdenadas = Object.entries(INSTITUCIONES).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, "es"));
+    institucionesCompareBody.innerHTML = filasOrdenadas.map(([instId, inst]) => {
+      const cantidad = CAREERS.filter(c => institucionIds(c).includes(instId)).length;
+      return `
+        <tr>
+          <td>${inst.nombre}</td>
+          <td>${inst.tipo}</td>
+          <td>${inst.modalidad.length > 90 ? inst.modalidad.slice(0, 90).trim() + "…" : inst.modalidad}</td>
+          <td>${cantidad}</td>
+          <td>${inst.direccion}</td>
+          <td><button type="button" class="compare-view-btn institucion-view-btn" data-id="${instId}">Ver carreras →</button></td>
+        </tr>
+      `;
+    }).join("");
+
+    institucionesCompareBody.querySelectorAll(".institucion-view-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const instId = btn.dataset.id;
+        activeInstitution = instId;
+        institutionSelect.value = instId;
+        renderGrid();
+        updateClearButton();
+        const carrerasSection = document.getElementById("carreras");
+        if (carrerasSection) carrerasSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }
+
   /* ---------------------- Chips de categoría ---------------------- */
   const categorias = ["Todas", ...Array.from(new Set(CAREERS.map(c => c.categoria))).sort((a,b)=>a.localeCompare(b,"es"))];
 
@@ -1336,6 +1367,17 @@
         showToast("No se pudo copiar el enlace");
       }
     }
+  });
+
+  /* ---------------------- Sorprendeme ---------------------- */
+  const surpriseBtn = document.getElementById("surpriseBtn");
+  let lastSurpriseId = null;
+
+  surpriseBtn.addEventListener("click", () => {
+    const pool = CAREERS.length > 1 ? CAREERS.filter(c => c.id !== lastSurpriseId) : CAREERS;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    lastSurpriseId = pick.id;
+    openDetail(pick.id);
   });
 
   /* ---------------------- Volver arriba ---------------------- */

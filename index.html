@@ -42,6 +42,7 @@
     </a>
 
     <nav class="main-nav" aria-label="Navegación principal">
+      <a href="#guia">Cómo elegir</a>
       <a href="#carreras">Carreras</a>
       <a href="#universidad">La universidad</a>
       <a href="#faq">Preguntas frecuentes</a>
@@ -78,13 +79,19 @@
 
       <div id="categoryChips" class="category-chips" role="tablist" aria-label="Filtrar por área"></div>
 
-      <!-- ============ FILTROS AVANZADOS ============ -->
-      <button id="filtersToggle" class="filters-toggle-btn" type="button" aria-expanded="false" aria-controls="filtersPanel">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        <span>Filtros avanzados</span>
-        <span id="filtersActiveBadge" class="filters-active-badge" hidden>0</span>
-        <svg class="filters-toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
+      <!-- ============ FILTROS AVANZADOS + SORPRENDEME ============ -->
+      <div class="hero-actions">
+        <button id="filtersToggle" class="filters-toggle-btn" type="button" aria-expanded="false" aria-controls="filtersPanel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          <span>Filtros avanzados</span>
+          <span id="filtersActiveBadge" class="filters-active-badge" hidden>0</span>
+          <svg class="filters-toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <button id="surpriseBtn" class="surprise-btn" type="button">
+          <span aria-hidden="true">🎲</span>
+          <span>Sorprendeme con una carrera</span>
+        </button>
+      </div>
       <div id="filtersPanel" class="filters-panel" hidden>
         <div class="filter-group">
           <span class="filter-label">Tipo de título</span>
@@ -117,6 +124,59 @@
     </div>
   </section>
 
+  <!-- ============ GUÍA: CÓMO ELEGIR CARRERA ============ -->
+  <section id="guia" class="guide-section">
+    <div class="container">
+      <p class="section-eyebrow">Antes de mirar el catálogo</p>
+      <h2>¿Cómo elegir carrera?</h2>
+      <p class="guide-intro">No hace falta tener la certeza absoluta antes de anotarte. Esta guía te ayuda a pensarlo con más claridad, elijas lo que elijas.</p>
+
+      <div class="guide-steps-grid">
+        <article class="guide-step-card">
+          <span class="guide-step-number">1</span>
+          <span class="guide-step-icon" aria-hidden="true">🔍</span>
+          <h3>Fijate qué te gusta hacer, no solo "qué conviene"</h3>
+          <p>Pensá en qué actividades elegís hacer aunque nadie te obligue: armar cosas, ayudar a otros, resolver problemas, hablar en público, crear contenido, trabajar con números. Ahí suele estar la primera pista.</p>
+        </article>
+
+        <article class="guide-step-card">
+          <span class="guide-step-number">2</span>
+          <span class="guide-step-icon" aria-hidden="true">📚</span>
+          <h3>Mirá tus materias, pero con ojo crítico</h3>
+          <p>No te quedes solo con la nota. Fijate en cuáles disfrutás el proceso de aprender, aunque te cuesten un poco, y en cuáles simplemente las "aguantás" para aprobar.</p>
+        </article>
+
+        <article class="guide-step-card">
+          <span class="guide-step-number">3</span>
+          <span class="guide-step-icon" aria-hidden="true">🗣️</span>
+          <h3>Hablá con gente que ya está en eso</h3>
+          <p>Un estudiante avanzado o alguien que ya trabaja en esa profesión te va a contar cosas que ninguna página web te cuenta: cómo es un día típico, qué es lo que menos les gusta, qué no se esperaban.</p>
+        </article>
+
+        <article class="guide-step-card">
+          <span class="guide-step-number">4</span>
+          <span class="guide-step-icon" aria-hidden="true">🧪</span>
+          <h3>Probá antes de decidir</h3>
+          <p>Las universidades suelen tener charlas abiertas, jornadas de puertas abiertas y materias de prueba. Aprovechalas: es la forma más barata de "probarte" una carrera antes de anotarte.</p>
+        </article>
+
+        <article class="guide-step-card">
+          <span class="guide-step-number">5</span>
+          <span class="guide-step-icon" aria-hidden="true">💰</span>
+          <h3>La salida laboral importa, pero no es lo único</h3>
+          <p>Tené en cuenta el sueldo y la demanda, sí — para eso está esta página. Pero una carrera bien paga que no te interesa nada también tiene un costo: los años que la vas a cursar sin disfrutarla.</p>
+        </article>
+
+        <article class="guide-step-card">
+          <span class="guide-step-number">6</span>
+          <span class="guide-step-icon" aria-hidden="true">🔁</span>
+          <h3>Elegir "mal" no es un fracaso</h3>
+          <p>Cambiar de carrera en el primer o segundo año es mucho más común de lo que parece, y muchas materias básicas se reconocen entre carreras afines. No es empezar de cero.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ GRILLA DE CARRERAS ============ -->
   <section id="carreras" class="careers-section">
     <div class="container">
@@ -142,6 +202,24 @@
       <p class="section-eyebrow">Dónde se estudia cada carrera</p>
       <h2>Instituciones en Chaco</h2>
       <p class="university-intro">Las carreras de esta guía se dictan en distintas universidades e institutos terciarios del Chaco, o son accesibles desde Presidencia Roque Sáenz Peña en modalidad virtual o presencial. Cada ficha de carrera indica en cuál se cursa.</p>
+
+      <h3 class="instituciones-compare-title">Comparalas de un vistazo</h3>
+      <div class="compare-table-wrap instituciones-compare-wrap">
+        <table class="compare-table instituciones-table">
+          <thead>
+            <tr>
+              <th>Institución</th>
+              <th>Tipo</th>
+              <th>Modalidad</th>
+              <th>Carreras</th>
+              <th>Ubicación</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="institucionesCompareBody"></tbody>
+        </table>
+      </div>
+
       <div id="institucionesGrid" class="instituciones-grid"></div>
     </div>
   </section>
@@ -237,7 +315,7 @@
   <p class="footer-copy">Proyecto educativo sin fines de lucro. Hecho con HTML, CSS y JavaScript puro.</p>
 
   <div class="credits-box">
-    <p class="credits-version">Versión 7.9</p>
+    <p class="credits-version">Versión 8.0</p>
     <p class="credits-text">Desarrollado por <strong>Monzón Dilan Agustín</strong>, con la asistencia de Claude (Anthropic).</p>
     <p class="credits-text">Este proyecto va a seguir recibiendo actualizaciones: más carreras, facultades y planes de estudio, y nuevas funciones para que sea cada vez más útil.</p>
   </div>

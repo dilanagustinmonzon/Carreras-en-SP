@@ -663,6 +663,10 @@
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 19h14"/></svg>
           <span id="downloadPdfBtnLabel">Descargar ficha en PDF</span>
         </button>
+        <button type="button" id="shareWhatsappBtn" class="quick-action-btn whatsapp-quick-btn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.09-.46-4.35-1.26l-.31-.19-3.01.79.8-2.93-.2-.3A7.95 7.95 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.9c-.24-.12-1.43-.71-1.65-.79-.22-.08-.38-.12-.54.12-.16.24-.62.79-.76.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.44-1.34-1.68-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.13 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.43-.58 1.63-1.15.2-.57.2-1.05.14-1.15-.06-.1-.22-.16-.46-.28z"/></svg>
+          <span>Compartir por WhatsApp</span>
+        </button>
       </div>
 
       ${!c.investigado ? `
@@ -799,6 +803,10 @@
     }
     if (downloadPdfBtn) {
       downloadPdfBtn.addEventListener("click", () => downloadCareerPdf(c));
+    }
+    const shareWhatsappBtn = document.getElementById("shareWhatsappBtn");
+    if (shareWhatsappBtn) {
+      shareWhatsappBtn.addEventListener("click", () => shareCareerOnWhatsapp(c));
     }
     detailContent.querySelectorAll(".related-career-card").forEach((btn) => {
       btn.addEventListener("click", () => openDetail(btn.dataset.id));
@@ -1034,6 +1042,7 @@
     favoritesCountEl.hidden = favoritesList.length === 0;
     favoritesToggleBtn.classList.toggle("active", showOnlyFavorites);
     favoritesToggleBtn.setAttribute("aria-pressed", showOnlyFavorites ? "true" : "false");
+    document.getElementById("shareFavoritesBtn").hidden = favoritesList.length === 0;
   }
 
   function toggleFavorite(id) {
@@ -1065,6 +1074,25 @@
   });
 
   updateFavoritesToggleUI();
+
+  /* ---------------------- Compartir por WhatsApp ---------------------- */
+  function shareCareerOnWhatsapp(c) {
+    const url = location.origin + location.pathname + "#" + c.id;
+    const texto = `Mirá esta carrera: *${c.nombre}* 🎓\n${c.descripcionBreve}\n\n${url}`;
+    window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank", "noopener");
+  }
+
+  function shareFavoritesOnWhatsapp() {
+    const favs = favoritesList.map(id => CAREERS.find(c => c.id === id)).filter(Boolean);
+    if (favs.length === 0) return;
+    const url = location.origin + location.pathname;
+    const listado = favs.map(c => `• ${c.nombre}`).join("\n");
+    const texto = `Estas son las carreras que estoy considerando 🎓:\n\n${listado}\n\nLas encontré acá: ${url}`;
+    window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank", "noopener");
+  }
+
+  const shareFavoritesBtn = document.getElementById("shareFavoritesBtn");
+  shareFavoritesBtn.addEventListener("click", shareFavoritesOnWhatsapp);
 
   /* ---------------------- Comparador de carreras ---------------------- */
   const MAX_COMPARE = 3;
@@ -1340,6 +1368,65 @@
     const current = root.getAttribute("data-theme");
     applyTheme(current === "dark" ? "light" : "dark");
   });
+
+  /* ---------------------- Modo lectura simple ---------------------- */
+  const readingModeToggle = document.getElementById("readingModeToggle");
+  const READING_MODE_KEY = "ov-reading-mode";
+
+  function applyReadingMode(on) {
+    root.classList.toggle("reading-mode", on);
+    readingModeToggle.classList.toggle("active", on);
+    readingModeToggle.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+
+  let readingModeOn = false;
+  try { readingModeOn = localStorage.getItem(READING_MODE_KEY) === "on"; } catch (e) { /* modo privado */ }
+  applyReadingMode(readingModeOn);
+
+  readingModeToggle.addEventListener("click", () => {
+    readingModeOn = !readingModeOn;
+    applyReadingMode(readingModeOn);
+    try { localStorage.setItem(READING_MODE_KEY, readingModeOn ? "on" : "off"); } catch (e) { /* modo privado */ }
+    showToast(readingModeOn ? "Modo lectura simple activado ✓" : "Modo lectura simple desactivado");
+  });
+
+  /* ---------------------- Búsqueda por voz ---------------------- */
+  const voiceSearchBtn = document.getElementById("voiceSearchBtn");
+  const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (SpeechRecognitionCtor) {
+    voiceSearchBtn.hidden = false;
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = "es-AR";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    let listening = false;
+
+    recognition.addEventListener("result", (e) => {
+      const transcript = e.results[0][0].transcript;
+      searchInput.value = transcript;
+      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      searchInput.focus();
+    });
+    recognition.addEventListener("end", () => {
+      listening = false;
+      voiceSearchBtn.classList.remove("listening");
+    });
+    recognition.addEventListener("error", () => {
+      listening = false;
+      voiceSearchBtn.classList.remove("listening");
+      showToast("No se pudo escuchar. Revisá el permiso del micrófono en tu navegador.");
+    });
+
+    voiceSearchBtn.addEventListener("click", () => {
+      if (listening) { recognition.stop(); return; }
+      try {
+        recognition.start();
+        listening = true;
+        voiceSearchBtn.classList.add("listening");
+      } catch (e) { /* ya estaba escuchando */ }
+    });
+  }
 
   /* ---------------------- Compartir ---------------------- */
   const shareBtn = document.getElementById("shareBtn");

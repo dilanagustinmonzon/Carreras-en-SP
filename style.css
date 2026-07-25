@@ -140,6 +140,9 @@ button { font-family: var(--font-body); cursor: pointer; }
 .icon-btn:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); }
 .icon-btn:active { transform: translateY(0); }
 
+.reading-mode-btn { font-family: var(--font-body); font-weight: 700; font-size: .82rem; letter-spacing: -.02em; }
+.reading-mode-btn.active { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+
 @media (max-width: 780px) {
   .main-nav { display: none; }
 }
@@ -213,7 +216,7 @@ button { font-family: var(--font-body); cursor: pointer; }
 }
 #searchInput {
   width: 100%;
-  padding: 16px 46px 16px 50px;
+  padding: 16px 80px 16px 50px;
   border-radius: 999px;
   border: 1.5px solid var(--card-border);
   background: var(--card);
@@ -225,6 +228,24 @@ button { font-family: var(--font-body); cursor: pointer; }
 }
 #searchInput:focus { border-color: var(--accent); outline: none; }
 #searchInput::placeholder { color: var(--text-faint); }
+
+.voice-search-btn {
+  position: absolute; right: 46px; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: color .15s ease, background .15s ease;
+}
+.voice-search-btn:hover { color: var(--accent); background: var(--accent-soft); }
+.voice-search-btn.listening { color: #e0527a; animation: micPulse 1.1s ease infinite; }
+@keyframes micPulse {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.18); }
+}
 
 .search-clear-btn {
   position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
@@ -476,6 +497,22 @@ button { font-family: var(--font-body); cursor: pointer; }
   font-weight: 700;
 }
 .favorites-toggle-btn.active .favorites-count-badge { background: rgba(255,255,255,.28); color: #fff; }
+
+.whatsapp-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--text-muted);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: .84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease;
+}
+.whatsapp-share-btn:hover { border-color: #25D366; color: #25D366; }
 .results-count { color: var(--text-faint); font-family: var(--font-mono); font-size: .85rem; }
 
 .careers-section { padding: 20px 0 70px; }
@@ -771,6 +808,7 @@ button { font-family: var(--font-body); cursor: pointer; }
 }
 .quick-action-btn:hover { border-color: var(--accent); transform: translateY(-2px); color: var(--accent); }
 .quick-action-btn svg { flex-shrink: 0; }
+.whatsapp-quick-btn:hover { border-color: #25D366; color: #25D366; }
 
 .detail-unverified-banner {
   margin: 22px 0;
@@ -1201,7 +1239,7 @@ body.has-compare-bar .back-to-top { bottom: 96px; }
   .hero { padding: 40px 0 32px; }
   .hero-title { font-size: clamp(1.6rem, 7vw, 2.2rem); }
   .hero-sub { font-size: .96rem; }
-  #searchInput { padding: 14px 18px 14px 46px; font-size: .95rem; }
+  #searchInput { padding: 14px 78px 14px 46px; font-size: .95rem; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .filters-toggle-btn, .surprise-btn { justify-content: center; width: 100%; }
 
@@ -1255,3 +1293,18 @@ body.has-compare-bar .back-to-top { bottom: 96px; }
   .detail-stats { grid-template-columns: 1fr; }
 }
 
+
+/* ---------------------------------------------------------------------
+   MODO LECTURA SIMPLE
+   --------------------------------------------------------------------- */
+/* Aumenta el tamaño de letra general (casi todo el sitio usa rem, así que
+   escala de forma pareja) y da más aire entre líneas para textos largos. */
+html.reading-mode { font-size: 118%; }
+html.reading-mode body { letter-spacing: .01em; }
+html.reading-mode p,
+html.reading-mode li,
+html.reading-mode .card-desc,
+html.reading-mode .hero-sub,
+html.reading-mode .guide-intro,
+html.reading-mode .university-intro { line-height: 1.85; }
+html.reading-mode .faq-item summary { line-height: 1.5; }

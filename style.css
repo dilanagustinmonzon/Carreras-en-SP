@@ -198,6 +198,17 @@ button { font-family: var(--font-body); cursor: pointer; }
 }
 .hero-sub strong { color: var(--text); font-family: var(--font-mono); font-weight: 500; }
 
+.site-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin: -14px 0 28px;
+  animation: fadeUp .7s ease .12s both;
+}
+.stat-item { display: flex; flex-direction: column; gap: 2px; }
+.stat-number { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.stat-label { font-size: .76rem; color: var(--text-faint); }
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -860,8 +871,48 @@ button { font-family: var(--font-body); cursor: pointer; }
 .salary-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius-s); padding: 16px; text-align: center; }
 .salary-card .lvl { font-size: .74rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
 .salary-card .amt { font-family: var(--font-mono); font-weight: 500; font-size: 1.02rem; }
+.salary-card .amt-usd { font-family: var(--font-mono); font-size: .8rem; color: var(--text-faint); margin-top: 4px; }
 .salary-note { font-size: .82rem; color: var(--text-faint); margin-top: 10px; }
 .salary-sources { font-size: .78rem; color: var(--text-faint); margin-top: 6px; }
+
+.salary-chart { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 18px; }
+.salary-bar-row { display: flex; align-items: center; gap: 12px; }
+.salary-bar-label { width: 90px; flex-shrink: 0; font-size: .8rem; color: var(--text-muted); font-weight: 500; }
+.salary-bar-track { flex: 1; background: var(--bg-elevated); border-radius: 999px; height: 26px; overflow: hidden; border: 1px solid var(--card-border); }
+.salary-bar-fill {
+  height: 100%;
+  min-width: 44px;
+  background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  transition: width .6s ease;
+}
+.salary-bar-value { font-family: var(--font-mono); font-size: .74rem; font-weight: 600; color: var(--accent-contrast); white-space: nowrap; }
+
+/* Línea de tiempo visual por carrera */
+.career-timeline { display: flex; flex-direction: column; }
+.timeline-step { display: flex; gap: 16px; }
+.timeline-dot-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.timeline-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  display: grid; place-items: center;
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.timeline-line { flex: 1; width: 2px; background: var(--card-border); min-height: 24px; margin: 4px 0; }
+.timeline-content { padding-bottom: 22px; }
+.timeline-year-label { display: block; font-family: var(--font-mono); font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint); margin-bottom: 4px; }
+.timeline-content p { margin: 0; font-size: .9rem; color: var(--text-muted); line-height: 1.5; }
+.timeline-step:last-child .timeline-content { padding-bottom: 4px; }
+.timeline-disclaimer { font-size: .78rem; color: var(--text-faint); margin-top: 4px; }
 
 .downloads-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-top: 14px; }
 .download-btn {
@@ -1239,6 +1290,8 @@ body.has-compare-bar .back-to-top { bottom: 96px; }
   .hero { padding: 40px 0 32px; }
   .hero-title { font-size: clamp(1.6rem, 7vw, 2.2rem); }
   .hero-sub { font-size: .96rem; }
+  .site-stats { gap: 18px; margin: -6px 0 22px; }
+  .stat-number { font-size: 1.2rem; }
   #searchInput { padding: 14px 78px 14px 46px; font-size: .95rem; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .filters-toggle-btn, .surprise-btn { justify-content: center; width: 100%; }

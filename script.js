@@ -35,6 +35,26 @@
 
   totalCarrerasEl.textContent = CAREERS.length;
 
+  /* ---------------------- Estadísticas del sitio ---------------------- */
+  (function renderSiteStats() {
+    const statsEl = document.getElementById("siteStats");
+    if (!statsEl) return;
+    const totalInstituciones = Object.keys(INSTITUCIONES).length;
+    const totalCategorias = new Set(CAREERS.map(c => c.categoria)).size;
+    const conFuenteReal = CAREERS.filter(c =>
+      c.salario && c.salario.fuentes && c.salario.fuentes.length &&
+      !c.salario.fuentes[0].startsWith("Estimación interna")
+    ).length;
+    const pctReal = Math.round((conFuenteReal / CAREERS.length) * 100);
+
+    statsEl.innerHTML = `
+      <div class="stat-item"><span class="stat-number">${CAREERS.length}</span><span class="stat-label">Carreras</span></div>
+      <div class="stat-item"><span class="stat-number">${totalInstituciones}</span><span class="stat-label">Instituciones</span></div>
+      <div class="stat-item"><span class="stat-number">${totalCategorias}</span><span class="stat-label">Áreas de estudio</span></div>
+      <div class="stat-item"><span class="stat-number">${pctReal}%</span><span class="stat-label">Con sueldo de fuentes relevadas</span></div>
+    `;
+  })();
+
   /* ---------------------- Tipo de título y modalidad (derivados) ---------------------- */
   function tipoTitulo(nombre) {
     const n = nombre.toLowerCase();
@@ -682,6 +702,8 @@
         <div class="stat-box"><div class="stat-label">Dificultad</div><div class="stat-value">${c.dificultad || "No disponible"}</div></div>
       </div>
 
+      ${buildTimelineHTML(c)}
+
       <div class="detail-section">
         <h3>🎯 ¿Qué hace este profesional?</h3>
         <p>${textOr(c.queHace)}</p>
@@ -749,12 +771,25 @@
       <div class="detail-section">
         <h3>💰 Salarios de referencia en Argentina</h3>
         ${salaryHasData ? `
+          ${buildSalaryChartHTML(c)}
           <div class="salary-grid">
-            <div class="salary-card"><div class="lvl">Junior</div><div class="amt">${c.salario.junior || "—"}</div></div>
-            <div class="salary-card"><div class="lvl">Semi senior</div><div class="amt">${c.salario.semiSenior || "—"}</div></div>
-            <div class="salary-card"><div class="lvl">Senior</div><div class="amt">${c.salario.senior || "—"}</div></div>
+            <div class="salary-card">
+              <div class="lvl">Junior</div>
+              <div class="amt">${c.salario.junior || "—"}</div>
+              ${c.salario.juniorUSD ? `<div class="amt-usd">${c.salario.juniorUSD} /mes</div>` : ""}
+            </div>
+            <div class="salary-card">
+              <div class="lvl">Semi senior</div>
+              <div class="amt">${c.salario.semiSenior || "—"}</div>
+              ${c.salario.semiSeniorUSD ? `<div class="amt-usd">${c.salario.semiSeniorUSD} /mes</div>` : ""}
+            </div>
+            <div class="salary-card">
+              <div class="lvl">Senior</div>
+              <div class="amt">${c.salario.senior || "—"}</div>
+              ${c.salario.seniorUSD ? `<div class="amt-usd">${c.salario.seniorUSD} /mes</div>` : ""}
+            </div>
           </div>
-          <p class="salary-note">Valores aproximados en ${c.salario.moneda || "ARS"}. Referencia: ${c.salario.fechaReferencia || "no especificada"}. ${c.salario.nota ? c.salario.nota : ""}</p>
+          <p class="salary-note">Valores aproximados en ${c.salario.moneda || "ARS"}. Referencia: ${c.salario.fechaReferencia || "no especificada"}. Equivalente en dólares calculado a ~$1.500 ARS = US$1 (referencia julio 2026; varía día a día). ${c.salario.nota ? c.salario.nota : ""}</p>
           <p class="salary-sources">Fuentes: ${c.salario.fuentes && c.salario.fuentes.length ? c.salario.fuentes.join(" · ") : "no especificadas"}</p>
         ` : `<p class="empty-field" style="color:var(--text-faint)">No pudo verificarse un rango salarial confiable para esta carrera todavía.</p>`}
       </div>
@@ -850,7 +885,7 @@
     if (c.habilidades && c.habilidades.length) parts.push(`Habilidades necesarias: ${c.habilidades.join(", ")}.`);
     if (c.salidasLaborales && c.salidasLaborales.length) parts.push(`Salidas laborales: ${c.salidasLaborales.join(", ")}.`);
     if (c.salario && (c.salario.junior || c.salario.semiSenior || c.salario.senior)) {
-      parts.push(`Sueldos de referencia en Argentina. Junior: ${c.salario.junior || "no disponible"}. Semi senior: ${c.salario.semiSenior || "no disponible"}. Senior: ${c.salario.senior || "no disponible"}.`);
+      parts.push(`Sueldos de referencia en Argentina. Junior: ${c.salario.junior || "no disponible"}${c.salario.juniorUSD ? ", equivalente aproximado " + c.salario.juniorUSD.replace("US$", "dólares") : ""}. Semi senior: ${c.salario.semiSenior || "no disponible"}. Senior: ${c.salario.senior || "no disponible"}.`);
     }
     if (c.ventajas && c.ventajas.length) parts.push(`Ventajas: ${c.ventajas.join(". ")}.`);
     if (c.desafios && c.desafios.length) parts.push(`Desafíos a tener en cuenta: ${c.desafios.join(". ")}.`);
@@ -983,7 +1018,7 @@
       const salaryHasData = c.salario && (c.salario.junior || c.salario.semiSenior || c.salario.senior);
       if (salaryHasData) {
         addHeading("Salarios de referencia en Argentina");
-        addParagraph(`Junior: ${c.salario.junior || "—"}   ·   Semi senior: ${c.salario.semiSenior || "—"}   ·   Senior: ${c.salario.senior || "—"}`);
+        addParagraph(`Junior: ${c.salario.junior || "—"}${c.salario.juniorUSD ? " (" + c.salario.juniorUSD + ")" : ""}   ·   Semi senior: ${c.salario.semiSenior || "—"}${c.salario.semiSeniorUSD ? " (" + c.salario.semiSeniorUSD + ")" : ""}   ·   Senior: ${c.salario.senior || "—"}${c.salario.seniorUSD ? " (" + c.salario.seniorUSD + ")" : ""}`);
         addParagraph(`Moneda: ${c.salario.moneda || "ARS"}. Referencia: ${c.salario.fechaReferencia || "no especificada"}.`);
         if (c.salario.fuentes && c.salario.fuentes.length) addParagraph(`Fuentes: ${c.salario.fuentes.join(" · ")}`);
       }
@@ -1191,6 +1226,88 @@
     return rest > 0 ? shown + ` (+${rest} más)` : shown;
   }
 
+  /* ---------------------- Gráfico visual de sueldos ---------------------- */
+  function parseAvgARS(str) {
+    if (!str) return null;
+    const tokens = str.match(/\d{1,3}(?:\.\d{3})+/g);
+    if (!tokens) return null;
+    const nums = tokens.map(t => Number(t.replace(/\./g, "")));
+    return nums.reduce((a, b) => a + b, 0) / nums.length;
+  }
+
+  function buildSalaryChartHTML(c) {
+    const niveles = [
+      { label: "Junior", valor: parseAvgARS(c.salario.junior), usd: c.salario.juniorUSD },
+      { label: "Semi senior", valor: parseAvgARS(c.salario.semiSenior), usd: c.salario.semiSeniorUSD },
+      { label: "Senior", valor: parseAvgARS(c.salario.senior), usd: c.salario.seniorUSD }
+    ];
+    const valoresValidos = niveles.map(n => n.valor).filter(v => v !== null);
+    if (valoresValidos.length === 0) return "";
+    const max = Math.max(...valoresValidos);
+
+    return `
+      <div class="salary-chart" role="img" aria-label="Gráfico de barras comparando el sueldo aproximado junior, semi senior y senior">
+        ${niveles.map(n => {
+          if (n.valor === null) return "";
+          const pct = Math.max(10, Math.round((n.valor / max) * 100));
+          return `
+            <div class="salary-bar-row">
+              <span class="salary-bar-label">${n.label}</span>
+              <div class="salary-bar-track">
+                <div class="salary-bar-fill" style="width:${pct}%">
+                  <span class="salary-bar-value">${n.usd || ""}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  /* ---------------------- Línea de tiempo visual por carrera ---------------------- */
+  function buildTimelineHTML(c) {
+    if (!c.duracionAnios) return "";
+    const steps = Math.max(1, Math.round(c.duracionAnios));
+    const items = [];
+    for (let i = 1; i <= steps; i++) {
+      let texto;
+      if (steps === 1) {
+        texto = "Formación intensiva, prácticas y trabajo final.";
+      } else if (i === 1) {
+        texto = "Materias introductorias y fundamentos generales de la carrera.";
+      } else if (i === steps) {
+        texto = "Prácticas profesionales, trabajo final o tesina, y egreso.";
+      } else if (i === steps - 1 && steps > 2) {
+        texto = "Especialización en contenidos específicos y primeras prácticas.";
+      } else {
+        texto = "Profundización en contenidos específicos de la carrera.";
+      }
+      items.push({ year: i, texto });
+    }
+
+    return `
+      <div class="detail-section">
+        <h3>🗓️ Recorrido orientativo de la carrera</h3>
+        <div class="career-timeline">
+          ${items.map((it, idx) => `
+            <div class="timeline-step">
+              <div class="timeline-dot-col">
+                <span class="timeline-dot">${it.year}</span>
+                ${idx < items.length - 1 ? `<span class="timeline-line"></span>` : ""}
+              </div>
+              <div class="timeline-content">
+                <span class="timeline-year-label">Año ${it.year}</span>
+                <p>${it.texto}</p>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+        <p class="timeline-disclaimer">Estructura orientativa según la duración informada; el detalle exacto por año puede variar según la institución — consultá el plan de estudios oficial para precisión.</p>
+      </div>
+    `;
+  }
+
   function modalidadTexto(c) {
     if (c.modalidadInstituciones) return c.modalidadInstituciones;
     const virtual = esVirtual(c), presencial = esPresencial(c);
@@ -1228,9 +1345,9 @@
     { label: "Perfil recomendado", get: c => truncateText(c.perfilRecomendado, 140) },
     { label: "Habilidades clave", get: c => compactListText(c.habilidades) },
     { label: "Salidas laborales", get: c => compactListText(c.salidasLaborales) },
-    { label: "Sueldo junior", get: c => (c.salario && c.salario.junior) || "No disponible" },
-    { label: "Sueldo semi senior", get: c => (c.salario && c.salario.semiSenior) || "No disponible" },
-    { label: "Sueldo senior", get: c => (c.salario && c.salario.senior) || "No disponible" },
+    { label: "Sueldo junior", get: c => (c.salario && c.salario.junior) ? `${c.salario.junior}${c.salario.juniorUSD ? " (" + c.salario.juniorUSD + ")" : ""}` : "No disponible" },
+    { label: "Sueldo semi senior", get: c => (c.salario && c.salario.semiSenior) ? `${c.salario.semiSenior}${c.salario.semiSeniorUSD ? " (" + c.salario.semiSeniorUSD + ")" : ""}` : "No disponible" },
+    { label: "Sueldo senior", get: c => (c.salario && c.salario.senior) ? `${c.salario.senior}${c.salario.seniorUSD ? " (" + c.salario.seniorUSD + ")" : ""}` : "No disponible" },
     { label: "Trabajo remoto", get: c => truncateText(c.trabajoRemoto, 100) },
     { label: "Demanda actual", get: c => truncateText(c.demandaActual, 120) }
   ];

@@ -760,6 +760,41 @@ button { font-family: var(--font-body); cursor: pointer; }
 .faq-item[open] summary::after { transform: rotate(45deg); }
 .faq-item p { color: var(--text-muted); margin: 0 0 18px; font-size: .93rem; }
 
+.contact-callout {
+  max-width: 780px;
+  margin: 32px 0 0;
+  padding: 24px 26px;
+  border: 1px dashed var(--card-border);
+  border-radius: var(--radius-s);
+  background: var(--card);
+}
+.contact-callout-title {
+  font-weight: 600;
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+.contact-callout-text {
+  color: var(--text-muted);
+  font-size: .9rem;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+.contact-callout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+  font-size: .88rem;
+  text-decoration: none;
+  word-break: break-word;
+  transition: transform .15s ease;
+}
+.contact-callout-btn:hover { transform: translateY(-2px); }
+
 /* ---------------------------------------------------------------------
    PANEL DE DETALLE (overlay a pantalla completa)
    --------------------------------------------------------------------- */

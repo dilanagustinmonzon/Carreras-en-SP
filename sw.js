@@ -12,7 +12,7 @@
    pueden seguir viendo la versión anterior por un tiempo.
    ===================================================================== */
 
-const CACHE_NAME = "ov-cache-v10";
+const CACHE_NAME = "ov-cache-v11";
 
 // Archivos propios del sitio que se guardan apenas se instala el Service Worker.
 const PRECACHE_URLS = [

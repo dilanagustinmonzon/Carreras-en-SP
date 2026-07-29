@@ -12,7 +12,7 @@
    pueden seguir viendo la versión anterior por un tiempo.
    ===================================================================== */
 
-const CACHE_NAME = "ov-cache-v12";
+const CACHE_NAME = "ov-cache-v14";
 
 // Archivos propios del sitio que se guardan apenas se instala el Service Worker.
 const PRECACHE_URLS = [
@@ -26,13 +26,7 @@ const PRECACHE_URLS = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-192-maskable.png",
-  "./icons/icon-512-maskable.png",
-  "./assets/logo-mark.png",
-  "./assets/fonts/Fraunces-SemiBold.ttf",
-  "./assets/fonts/Fraunces-Bold.ttf",
-  "./assets/fonts/Inter-Regular.ttf",
-  "./assets/fonts/Inter-SemiBold.ttf",
-  "./assets/fonts/Inter-Bold.ttf"
+  "./icons/icon-512-maskable.png"
 ];
 
 self.addEventListener("install", (event) => {

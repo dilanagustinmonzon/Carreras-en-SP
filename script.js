@@ -936,7 +936,21 @@
   window.addEventListener("pagehide", stopSpeech);
 
   /* ---------------------- Accesibilidad: descargar ficha en PDF ---------------------- */
+  // El PDF replica la identidad visual del sitio (modo oscuro): mismos colores,
+  // mismas tipografías (Fraunces para títulos, Inter para texto) y el isotipo
+  // de la brújula en el encabezado y pie de página.
   let jsPdfLoadPromise = null;
+  let pdfAssetsPromise = null;
+
+  const PDF_COLORS = {
+    bg: [14, 20, 32],        // --bg (oscuro)
+    card: [22, 30, 46],      // --card (oscuro)
+    cardBorder: [38, 47, 66],// --card-border (oscuro)
+    text: [234, 237, 244],   // --text (oscuro)
+    textMuted: [160, 168, 186], // --text-muted (oscuro)
+    textFaint: [107, 115, 133], // --text-faint (oscuro)
+    accent: [227, 167, 91],  // --accent (oscuro)
+  };
 
   function loadJsPDF() {
     if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
@@ -954,59 +968,176 @@
     return jsPdfLoadPromise;
   }
 
+  // Convierte un archivo (fuente o imagen) a base64 para incrustarlo en el PDF.
+  // Se cargan una sola vez y se reutilizan en las descargas siguientes.
+  function fetchAsBase64(url) {
+    return fetch(url).then((r) => {
+      if (!r.ok) throw new Error("No se pudo cargar " + url);
+      return r.arrayBuffer();
+    }).then((buf) => {
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+      }
+      return btoa(binary);
+    });
+  }
+
+  function loadPdfAssets() {
+    if (pdfAssetsPromise) return pdfAssetsPromise;
+    pdfAssetsPromise = Promise.all([
+      fetchAsBase64("assets/fonts/Fraunces-SemiBold.ttf"),
+      fetchAsBase64("assets/fonts/Fraunces-Bold.ttf"),
+      fetchAsBase64("assets/fonts/Inter-Regular.ttf"),
+      fetchAsBase64("assets/fonts/Inter-SemiBold.ttf"),
+      fetchAsBase64("assets/fonts/Inter-Bold.ttf"),
+      fetchAsBase64("assets/logo-mark.png"),
+    ]).then(([frauncesSemiBold, frauncesBold, interRegular, interSemiBold, interBold, logoMark]) => ({
+      frauncesSemiBold, frauncesBold, interRegular, interSemiBold, interBold, logoMark
+    }));
+    return pdfAssetsPromise;
+  }
+
   function downloadCareerPdf(c) {
     const btnLabel = document.getElementById("downloadPdfBtnLabel");
     const originalLabel = btnLabel ? btnLabel.textContent : null;
     if (btnLabel) btnLabel.textContent = "Generando PDF…";
 
-    loadJsPDF().then((jsPDF) => {
+    Promise.all([loadJsPDF(), loadPdfAssets()]).then(([jsPDF, assets]) => {
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const marginX = 48;
       const maxWidth = pageWidth - marginX * 2;
-      let y = 56;
+      const contentTop = 132;
+      const footerReserve = 46;
 
-      function ensureSpace(lineHeight) {
-        if (y + lineHeight > pageHeight - 48) { doc.addPage(); y = 56; }
+      // ---- Registrar tipografías propias del sitio ----
+      doc.addFileToVFS("Fraunces-SemiBold.ttf", assets.frauncesSemiBold);
+      doc.addFont("Fraunces-SemiBold.ttf", "FrauncesSB", "normal");
+      doc.addFileToVFS("Fraunces-Bold.ttf", assets.frauncesBold);
+      doc.addFont("Fraunces-Bold.ttf", "FrauncesBold", "normal");
+      doc.addFileToVFS("Inter-Regular.ttf", assets.interRegular);
+      doc.addFont("Inter-Regular.ttf", "Inter", "normal");
+      doc.addFileToVFS("Inter-SemiBold.ttf", assets.interSemiBold);
+      doc.addFont("Inter-SemiBold.ttf", "InterSB", "normal");
+      doc.addFileToVFS("Inter-Bold.ttf", assets.interBold);
+      doc.addFont("Inter-Bold.ttf", "InterBold", "normal");
+
+      let y = contentTop;
+      let pageNum = 1;
+
+      function paintBackground() {
+        doc.setFillColor(...PDF_COLORS.bg);
+        doc.rect(0, 0, pageWidth, pageHeight, "F");
       }
-      function addTitle(text) {
-        doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-        doc.splitTextToSize(text, maxWidth).forEach((line) => { ensureSpace(24); doc.text(line, marginX, y); y += 24; });
-        y += 4;
+
+      function drawContinuationHeader() {
+        doc.addImage(assets.logoMark, "PNG", marginX, 30, 18, 18);
+        doc.setFont("InterSB", "normal"); doc.setFontSize(9); doc.setTextColor(...PDF_COLORS.accent);
+        doc.text("ORIENTACIÓN VOCACIONAL", marginX + 26, 42);
+        doc.setDrawColor(...PDF_COLORS.cardBorder);
+        doc.setLineWidth(0.75);
+        doc.line(marginX, 66, pageWidth - marginX, 66);
       }
+
+      function newPage() {
+        doc.addPage();
+        pageNum++;
+        paintBackground();
+        drawContinuationHeader();
+        y = 92;
+      }
+
+      function ensureSpace(h) {
+        if (y + h > pageHeight - footerReserve) newPage();
+      }
+
       function addHeading(text) {
-        ensureSpace(26); y += 10;
-        doc.setFont("helvetica", "bold"); doc.setFontSize(12.5); doc.setTextColor(160, 90, 30);
+        ensureSpace(28); y += 14;
+        doc.setFont("FrauncesSB", "normal"); doc.setFontSize(13); doc.setTextColor(...PDF_COLORS.accent);
         doc.text(text, marginX, y);
-        doc.setTextColor(20, 20, 20);
-        y += 16;
+        y += 17;
       }
       function addParagraph(text) {
-        doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+        doc.setFont("Inter", "normal"); doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.textMuted);
         doc.splitTextToSize(text, maxWidth).forEach((line) => { ensureSpace(15); doc.text(line, marginX, y); y += 14.5; });
         y += 4;
       }
       function addList(items) {
-        doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+        doc.setFont("Inter", "normal"); doc.setFontSize(10);
         items.forEach((item) => {
-          doc.splitTextToSize("•  " + item, maxWidth).forEach((line, i) => { ensureSpace(15); doc.text(line, marginX, y); y += 14.5; });
+          doc.splitTextToSize(item, maxWidth - 16).forEach((line, i) => {
+            ensureSpace(15);
+            if (i === 0) { doc.setTextColor(...PDF_COLORS.accent); doc.text("•", marginX, y); }
+            doc.setTextColor(...PDF_COLORS.textMuted);
+            doc.text(line, marginX + 14, y);
+            y += 14.5;
+          });
         });
         y += 4;
       }
 
-      addTitle(c.nombre);
-      doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(110, 110, 110);
+      // Tarjeta con fondo tipo "card" del sitio, para datos clave (duración,
+      // modalidad, sueldos). Mide el contenido antes de dibujar el fondo.
+      function addCard(title, rows) {
+        const pad = 16;
+        doc.setFont("Inter", "normal"); doc.setFontSize(10);
+        const innerWidth = maxWidth - pad * 2;
+        const wrappedRows = rows.map((r) => doc.splitTextToSize(r, innerWidth));
+        const lineCount = wrappedRows.reduce((sum, w) => sum + w.length, 0);
+        const titleH = 22;
+        const lineH = 14.5;
+        const totalH = pad * 2 + titleH + lineCount * lineH;
+
+        ensureSpace(totalH + 16);
+        y += 10;
+        doc.setFillColor(...PDF_COLORS.card);
+        doc.setDrawColor(...PDF_COLORS.cardBorder);
+        doc.setLineWidth(0.75);
+        doc.roundedRect(marginX, y, maxWidth, totalH, 8, 8, "FD");
+
+        let cy = y + pad + 13;
+        doc.setFont("FrauncesSB", "normal"); doc.setFontSize(11.5); doc.setTextColor(...PDF_COLORS.accent);
+        doc.text(title, marginX + pad, cy);
+        cy += titleH;
+
+        doc.setFont("Inter", "normal"); doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.textMuted);
+        wrappedRows.forEach((wrapped) => {
+          wrapped.forEach((line) => { doc.text(line, marginX + pad, cy); cy += lineH; });
+        });
+
+        y += totalH + 18;
+      }
+
+      // ---- Fondo + encabezado principal (portada) ----
+      paintBackground();
+      doc.addImage(assets.logoMark, "PNG", marginX, 34, 34, 34);
+      doc.setFont("InterSB", "normal"); doc.setFontSize(10.5); doc.setTextColor(...PDF_COLORS.accent);
+      doc.text("ORIENTACIÓN VOCACIONAL", marginX + 44, 48);
+      doc.setFont("Inter", "normal"); doc.setFontSize(8.5); doc.setTextColor(...PDF_COLORS.textFaint);
+      doc.text("Guía para estudiantes secundarios · Chaco", marginX + 44, 60);
+      doc.setDrawColor(...PDF_COLORS.cardBorder);
+      doc.setLineWidth(0.75);
+      doc.line(marginX, 86, pageWidth - marginX, 86);
+
+      y = 118;
+      doc.setFont("FrauncesBold", "normal"); doc.setFontSize(20); doc.setTextColor(...PDF_COLORS.text);
+      doc.splitTextToSize(c.nombre, maxWidth).forEach((line) => { ensureSpace(26); doc.text(line, marginX, y); y += 26; });
+
+      doc.setFont("Inter", "normal"); doc.setFontSize(10); doc.setTextColor(...PDF_COLORS.textMuted);
       const subtitle = c.categoria + (institucionNombres(c.institucion).length ? " · " + institucionNombres(c.institucion).join(", ") : "");
       doc.splitTextToSize(subtitle, maxWidth).forEach((line) => { doc.text(line, marginX, y); y += 13; });
-      doc.setTextColor(20, 20, 20);
-      y += 10;
+      y += 8;
 
-      addHeading("Datos generales");
-      addParagraph(`Duración: ${c.duracionInstituciones || (c.duracionAnios ? c.duracionAnios + " años" : "No disponible")}`);
-      addParagraph(`Carga horaria: ${c.cargaHoraria || "No disponible"}`);
-      addParagraph(`Dificultad: ${c.dificultad || "No disponible"}`);
-      addParagraph(`Modalidad: ${modalidadTexto(c)}`);
+      addCard("Datos generales", [
+        `Duración: ${c.duracionInstituciones || (c.duracionAnios ? c.duracionAnios + " años" : "No disponible")}`,
+        `Carga horaria: ${c.cargaHoraria || "No disponible"}`,
+        `Dificultad: ${c.dificultad || "No disponible"}`,
+        `Modalidad: ${modalidadTexto(c)}`,
+      ]);
 
       if (c.queHace) { addHeading("¿Qué hace este profesional?"); addParagraph(c.queHace); }
       if (c.problemasQueResuelve) { addHeading("¿Qué problemas resuelve?"); addParagraph(c.problemasQueResuelve); }
@@ -1017,21 +1148,31 @@
 
       const salaryHasData = c.salario && (c.salario.junior || c.salario.semiSenior || c.salario.senior);
       if (salaryHasData) {
-        addHeading("Salarios de referencia en Argentina");
-        addParagraph(`Junior: ${c.salario.junior || "—"}${c.salario.juniorUSD ? " (" + c.salario.juniorUSD + ")" : ""}   ·   Semi senior: ${c.salario.semiSenior || "—"}${c.salario.semiSeniorUSD ? " (" + c.salario.semiSeniorUSD + ")" : ""}   ·   Senior: ${c.salario.senior || "—"}${c.salario.seniorUSD ? " (" + c.salario.seniorUSD + ")" : ""}`);
-        addParagraph(`Moneda: ${c.salario.moneda || "ARS"}. Referencia: ${c.salario.fechaReferencia || "no especificada"}.`);
-        if (c.salario.fuentes && c.salario.fuentes.length) addParagraph(`Fuentes: ${c.salario.fuentes.join(" · ")}`);
+        const salaryRows = [
+          `Junior: ${c.salario.junior || "—"}${c.salario.juniorUSD ? " (" + c.salario.juniorUSD + ")" : ""}`,
+          `Semi senior: ${c.salario.semiSenior || "—"}${c.salario.semiSeniorUSD ? " (" + c.salario.semiSeniorUSD + ")" : ""}`,
+          `Senior: ${c.salario.senior || "—"}${c.salario.seniorUSD ? " (" + c.salario.seniorUSD + ")" : ""}`,
+          `Moneda: ${c.salario.moneda || "ARS"}. Referencia: ${c.salario.fechaReferencia || "no especificada"}.`,
+        ];
+        if (c.salario.fuentes && c.salario.fuentes.length) salaryRows.push(`Fuentes: ${c.salario.fuentes.join(" · ")}`);
+        addCard("Salarios de referencia en Argentina", salaryRows);
       }
 
       if (c.ventajas && c.ventajas.length) { addHeading("Ventajas"); addList(c.ventajas); }
       if (c.desafios && c.desafios.length) { addHeading("Desafíos"); addList(c.desafios); }
       if (c.datosInteresantes && c.datosInteresantes.length) { addHeading("Datos interesantes"); addList(c.datosInteresantes); }
 
+      // ---- Pie de página en todas las hojas ----
       const totalPages = doc.internal.getNumberOfPages();
       for (let p = 1; p <= totalPages; p++) {
         doc.setPage(p);
-        doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
-        doc.text(`Orientación Vocacional · ${c.nombre} · Página ${p} de ${totalPages}`, marginX, pageHeight - 24);
+        doc.setDrawColor(...PDF_COLORS.cardBorder);
+        doc.setLineWidth(0.5);
+        doc.line(marginX, pageHeight - 34, pageWidth - marginX, pageHeight - 34);
+        doc.addImage(assets.logoMark, "PNG", marginX, pageHeight - 26, 11, 11);
+        doc.setFont("Inter", "normal"); doc.setFontSize(8); doc.setTextColor(...PDF_COLORS.textFaint);
+        doc.text(`Orientación Vocacional · ${c.nombre}`, marginX + 16, pageHeight - 18);
+        doc.text(`Página ${p} de ${totalPages}`, pageWidth - marginX, pageHeight - 18, { align: "right" });
       }
 
       doc.save("ficha-" + c.id + ".pdf");

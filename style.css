@@ -1398,3 +1398,141 @@ html.reading-mode .hero-sub,
 html.reading-mode .guide-intro,
 html.reading-mode .university-intro { line-height: 1.85; }
 html.reading-mode .faq-item summary { line-height: 1.5; }
+
+
+/* =====================================================================
+   TEST VOCACIONAL (RIASEC) — vocational-test.js
+   ===================================================================== */
+.vocational-test-section {
+  padding: 64px 0;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
+}
+.vt-container { max-width: 640px; margin: 32px auto 0; }
+
+/* Intro */
+.vt-intro { text-align: center; padding: 32px 24px; background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius-l); box-shadow: var(--shadow); }
+.vt-intro-text { color: var(--text-muted); margin: 0 0 24px; line-height: 1.6; }
+
+/* Botones */
+.vt-start-btn {
+  display: inline-block; border: none; cursor: pointer;
+  background: var(--accent); color: var(--accent-contrast);
+  font-family: var(--font-body); font-weight: 700; font-size: .95rem;
+  padding: 13px 28px; border-radius: var(--radius-s);
+  transition: transform .15s ease, opacity .15s ease;
+}
+.vt-start-btn:hover { transform: translateY(-1px); }
+.vt-start-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.vt-secondary-btn {
+  display: inline-block; border: 1px solid var(--card-border); cursor: pointer;
+  background: transparent; color: var(--text); font-family: var(--font-body);
+  font-weight: 600; font-size: .9rem; padding: 12px 20px; border-radius: var(--radius-s);
+  margin-left: 8px;
+}
+.vt-secondary-btn:hover { background: var(--bg); }
+.vt-secondary-btn:disabled { opacity: .35; cursor: not-allowed; }
+.vt-intro .vt-secondary-btn { display: block; margin: 14px auto 0; width: fit-content; }
+
+/* Quiz */
+.vt-quiz { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius-l); padding: 28px 24px; box-shadow: var(--shadow); }
+.vt-progress-track { width: 100%; height: 6px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.vt-progress-fill { height: 100%; background: var(--accent); transition: width .25s ease; }
+.vt-progress-label { font-size: .78rem; color: var(--text-faint); margin: 8px 0 20px; font-family: var(--font-mono); }
+.vt-question { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.4; margin: 0 0 22px; }
+
+.vt-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
+.vt-option-btn {
+  cursor: pointer; text-align: center; font-family: var(--font-body); font-weight: 600; font-size: .88rem;
+  padding: 14px 10px; border-radius: var(--radius-s); border: 1.5px solid var(--card-border);
+  background: var(--bg); color: var(--text); transition: border-color .15s ease, background .15s ease;
+}
+.vt-option-btn:hover { border-color: var(--accent); }
+.vt-option-btn.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+
+.vt-nav { display: flex; justify-content: space-between; align-items: center; }
+.vt-nav .vt-secondary-btn { margin-left: 0; }
+
+/* Resultado */
+.vt-result { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius-l); padding: 32px 24px; box-shadow: var(--shadow); }
+.vt-result-eyebrow { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); font-weight: 700; margin: 0 0 6px; }
+.vt-result-title { font-family: var(--font-display); font-size: 1.5rem; margin: 0 0 4px; }
+.vt-result-code { font-family: var(--font-mono); font-size: .82rem; color: var(--text-faint); margin: 0 0 14px; }
+.vt-result-explain { color: var(--text-muted); line-height: 1.6; margin: 0 0 28px; }
+
+.vt-result-block { margin-bottom: 28px; }
+.vt-result-block h4 { font-family: var(--font-display); font-size: 1.02rem; margin: 0 0 14px; }
+.vt-result-note { font-size: .82rem; color: var(--text-faint); margin: -8px 0 14px; }
+
+.vt-dim-bars { display: flex; flex-direction: column; gap: 10px; }
+.vt-dim-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
+.vt-dim-label { font-size: .82rem; color: var(--text-muted); }
+.vt-dim-track { height: 8px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.vt-dim-fill { height: 100%; background: var(--link); border-radius: 6px; }
+.vt-dim-value { font-family: var(--font-mono); font-size: .74rem; color: var(--text-faint); text-align: right; }
+
+.vt-cat-bars { display: flex; flex-direction: column; gap: 12px; }
+.vt-cat-row { display: flex; flex-direction: column; gap: 4px; }
+.vt-cat-label { font-size: .88rem; font-weight: 600; }
+.vt-cat-track { height: 9px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.vt-cat-fill { height: 100%; background: var(--accent); border-radius: 6px; }
+
+.vt-careers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.vt-career-card {
+  display: flex; gap: 12px; align-items: flex-start; text-align: left; cursor: pointer;
+  background: var(--bg); border: 1px solid var(--card-border); border-radius: var(--radius-m);
+  padding: 14px; transition: border-color .15s ease, transform .15s ease;
+}
+.vt-career-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.vt-career-icon { font-size: 1.4rem; flex-shrink: 0; }
+.vt-career-info { display: flex; flex-direction: column; gap: 2px; }
+.vt-career-info strong { font-size: .92rem; line-height: 1.3; }
+.vt-career-cat { font-size: .72rem; color: var(--accent); font-weight: 600; }
+.vt-career-desc { font-size: .78rem; color: var(--text-muted); line-height: 1.4; margin-top: 2px; }
+
+.vt-result-actions { text-align: center; padding-top: 8px; border-top: 1px solid var(--card-border); }
+
+@media (max-width: 640px) {
+  .vt-options { grid-template-columns: 1fr 1fr; }
+  .vt-dim-row { grid-template-columns: 90px 1fr 36px; }
+  .vt-careers-grid { grid-template-columns: 1fr; }
+  .vt-nav { flex-direction: column-reverse; gap: 10px; }
+  .vt-nav .vt-start-btn, .vt-nav .vt-secondary-btn { width: 100%; margin-left: 0; }
+}
+
+
+/* =====================================================================
+   TOOLBAR DE BÚSQUEDA/FILTROS reubicado al inicio de #carreras (v9.1)
+   ===================================================================== */
+.careers-toolbar { margin: 22px 0 36px; }
+.careers-toolbar .search-wrap { max-width: 640px; }
+
+
+/* =====================================================================
+   BOTÓN REPLEGAR/DESPLEGAR LISTA DE CARRERAS (careers-toggle.js)
+   ===================================================================== */
+.toggle-careers-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--card-border);
+  background: var(--card);
+  color: var(--text-muted);
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 600;
+  transition: border-color .18s ease, color .18s ease, opacity .18s ease;
+}
+.toggle-careers-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+.toggle-careers-chevron { transition: transform .2s ease; flex-shrink: 0; }
+.toggle-careers-btn[aria-expanded="false"] .toggle-careers-chevron { transform: rotate(180deg); }
+.toggle-careers-btn:disabled,
+.toggle-careers-btn.is-locked { opacity: .45; cursor: not-allowed; }
+
+#careersListWrap.careers-collapsed > * { display: none; }
+
+@media (max-width: 640px) {
+  .toggle-careers-btn { width: 100%; justify-content: center; }
+}

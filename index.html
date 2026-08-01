@@ -68,6 +68,7 @@
 
     <nav class="main-nav" aria-label="Navegación principal">
       <a href="#guia">Cómo elegir</a>
+      <a href="#test-vocacional">Test vocacional</a>
       <a href="#carreras">Carreras</a>
       <a href="#universidad">La universidad</a>
       <a href="#faq">Preguntas frecuentes</a>
@@ -98,62 +99,6 @@
       <p class="hero-sub">Explorá <strong id="totalCarreras">47</strong> carreras universitarias y terciarias: qué hace cada profesional, cuánto se gana en Argentina, qué salidas laborales tiene y qué materias vas a cursar. Sin vueltas, con información real.</p>
 
       <div id="siteStats" class="site-stats"></div>
-
-      <div class="search-wrap">
-        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="searchInput" type="text" placeholder="Buscá por nombre, salida laboral, materia, habilidad..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="searchSuggestions" aria-autocomplete="list">
-        <button id="voiceSearchBtn" class="voice-search-btn" type="button" hidden aria-label="Buscar por voz" title="Buscar por voz">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        </button>
-        <button id="searchClear" class="search-clear-btn" type="button" hidden aria-label="Borrar búsqueda">✕</button>
-        <div id="searchSuggestions" class="search-suggestions" role="listbox" hidden></div>
-      </div>
-      <p id="searchHint" class="search-hint" hidden></p>
-
-      <div id="categoryChips" class="category-chips" role="tablist" aria-label="Filtrar por área"></div>
-
-      <!-- ============ FILTROS AVANZADOS + SORPRENDEME ============ -->
-      <div class="hero-actions">
-        <button id="filtersToggle" class="filters-toggle-btn" type="button" aria-expanded="false" aria-controls="filtersPanel">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-          <span>Filtros avanzados</span>
-          <span id="filtersActiveBadge" class="filters-active-badge" hidden>0</span>
-          <svg class="filters-toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <button id="surpriseBtn" class="surprise-btn" type="button">
-          <span aria-hidden="true">🎲</span>
-          <span>Sorprendeme con una carrera</span>
-        </button>
-      </div>
-      <div id="filtersPanel" class="filters-panel" hidden>
-        <div class="filter-group">
-          <span class="filter-label">Tipo de título</span>
-          <div id="titleChips" class="category-chips" role="tablist" aria-label="Filtrar por tipo de título"></div>
-        </div>
-        <div class="filter-group">
-          <span class="filter-label">Modalidad</span>
-          <div id="modalityChips" class="category-chips" role="tablist" aria-label="Filtrar por modalidad"></div>
-        </div>
-        <div class="filter-group">
-          <span class="filter-label">Duración</span>
-          <div id="durationChips" class="category-chips" role="tablist" aria-label="Filtrar por duración"></div>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label" for="institutionFilter">Facultad / Institución</label>
-          <select id="institutionFilter" class="institution-select" aria-label="Filtrar por institución"></select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label" for="sortSelect">Ordenar por</label>
-          <select id="sortSelect" class="institution-select" aria-label="Ordenar resultados">
-            <option value="relevancia">Relevancia</option>
-            <option value="az">Nombre (A-Z)</option>
-            <option value="duracion-asc">Duración: más corta primero</option>
-            <option value="duracion-desc">Duración: más larga primero</option>
-            <option value="sueldo-desc">Sueldo inicial: mayor a menor</option>
-          </select>
-        </div>
-        <button id="clearFilters" class="clear-filters-btn" type="button" hidden>✕ Limpiar filtros</button>
-      </div>
     </div>
   </section>
 
@@ -210,6 +155,16 @@
     </div>
   </section>
 
+  <!-- ============ TEST VOCACIONAL ============ -->
+  <section id="test-vocacional" class="vocational-test-section">
+    <div class="container">
+      <p class="section-eyebrow">¿Todavía no sabés por dónde arrancar?</p>
+      <h2>Hacé el test vocacional</h2>
+      <p class="guide-intro">18 preguntas rápidas para descubrir tu perfil (modelo RIASEC, el que usan las universidades) y ver qué carreras de esta guía son más afines a vos.</p>
+      <div id="testVocacionalContent" class="vt-container"><!-- se completa dinámicamente con vocational-test.js --></div>
+    </div>
+  </section>
+
   <!-- ============ GRILLA DE CARRERAS ============ -->
   <section id="carreras" class="careers-section">
     <div class="container">
@@ -226,10 +181,75 @@
             <span>Compartir favoritos</span>
           </button>
           <span id="resultsCount" class="results-count"></span>
+          <button id="toggleCareersBtn" class="toggle-careers-btn" type="button" aria-expanded="true" aria-controls="careersListWrap">
+            <svg class="toggle-careers-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+            <span>Ocultar la lista</span>
+          </button>
         </div>
       </div>
-      <div id="careersGrid" class="careers-grid"></div>
-      <p id="noResults" class="no-results" hidden>No encontramos carreras que coincidan con tu búsqueda. Probá con otra palabra.</p>
+
+      <div class="careers-toolbar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="searchInput" type="text" placeholder="Buscá por nombre, salida laboral, materia, habilidad..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="searchSuggestions" aria-autocomplete="list">
+          <button id="voiceSearchBtn" class="voice-search-btn" type="button" hidden aria-label="Buscar por voz" title="Buscar por voz">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <button id="searchClear" class="search-clear-btn" type="button" hidden aria-label="Borrar búsqueda">✕</button>
+          <div id="searchSuggestions" class="search-suggestions" role="listbox" hidden></div>
+        </div>
+        <p id="searchHint" class="search-hint" hidden></p>
+
+        <div id="categoryChips" class="category-chips" role="tablist" aria-label="Filtrar por área"></div>
+
+        <!-- ============ FILTROS AVANZADOS + SORPRENDEME ============ -->
+        <div class="hero-actions">
+          <button id="filtersToggle" class="filters-toggle-btn" type="button" aria-expanded="false" aria-controls="filtersPanel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            <span>Filtros avanzados</span>
+            <span id="filtersActiveBadge" class="filters-active-badge" hidden>0</span>
+            <svg class="filters-toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button id="surpriseBtn" class="surprise-btn" type="button">
+            <span aria-hidden="true">🎲</span>
+            <span>Sorprendeme con una carrera</span>
+          </button>
+        </div>
+        <div id="filtersPanel" class="filters-panel" hidden>
+          <div class="filter-group">
+            <span class="filter-label">Tipo de título</span>
+            <div id="titleChips" class="category-chips" role="tablist" aria-label="Filtrar por tipo de título"></div>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">Modalidad</span>
+            <div id="modalityChips" class="category-chips" role="tablist" aria-label="Filtrar por modalidad"></div>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">Duración</span>
+            <div id="durationChips" class="category-chips" role="tablist" aria-label="Filtrar por duración"></div>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="institutionFilter">Facultad / Institución</label>
+            <select id="institutionFilter" class="institution-select" aria-label="Filtrar por institución"></select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="sortSelect">Ordenar por</label>
+            <select id="sortSelect" class="institution-select" aria-label="Ordenar resultados">
+              <option value="relevancia">Relevancia</option>
+              <option value="az">Nombre (A-Z)</option>
+              <option value="duracion-asc">Duración: más corta primero</option>
+              <option value="duracion-desc">Duración: más larga primero</option>
+              <option value="sueldo-desc">Sueldo inicial: mayor a menor</option>
+            </select>
+          </div>
+          <button id="clearFilters" class="clear-filters-btn" type="button" hidden>✕ Limpiar filtros</button>
+        </div>
+      </div>
+
+      <div id="careersListWrap">
+        <div id="careersGrid" class="careers-grid"></div>
+        <p id="noResults" class="no-results" hidden>No encontramos carreras que coincidan con tu búsqueda. Probá con otra palabra.</p>
+      </div>
     </div>
   </section>
 
@@ -368,7 +388,7 @@
   <p class="footer-copy">Proyecto educativo sin fines de lucro. Hecho con HTML, CSS y JavaScript puro.</p>
 
   <div class="credits-box">
-    <p class="credits-version">Versión 8.9</p>
+    <p class="credits-version">Versión 9.2</p>
     <p class="credits-text">Desarrollado por <strong>Monzón Dilan Agustín</strong>, con la asistencia de Claude (Anthropic).</p>
     <p class="credits-text">Este proyecto va a seguir recibiendo actualizaciones: más carreras, facultades y planes de estudio, y nuevas funciones para que sea cada vez más útil.</p>
   </div>
@@ -377,6 +397,8 @@
 <script src="careers-data.js"></script>
 <script src="pdfs-data.js"></script>
 <script src="script.js"></script>
+<script src="vocational-test.js"></script>
+<script src="careers-toggle.js"></script>
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {

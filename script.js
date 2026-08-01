@@ -1734,4 +1734,7 @@
   /* ---------------------- Primer render ---------------------- */
   renderGrid();
 
+  /* ---------------------- Exponer para vocational-test.js ---------------------- */
+  window.openDetail = openDetail;
+
 })();
